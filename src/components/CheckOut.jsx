@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -9,16 +9,17 @@ import {
   RadioGroup,
   FormControlLabel,
   FormControl,
-  Select,
-  MenuItem,
   Snackbar,
 } from "@mui/material";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import { Link } from "react-router-dom";
 import { Close } from "@mui/icons-material";
-import { useSelector, useDispatch } from "react-redux";
-import { selectCartItems, removeItemFromCart } from "../redux/cartSlice";
+import { useSelector } from "react-redux";
+import { selectCartItems } from "../redux/cartSlice";
+import Select from "react-select";
+import countryList from "react-select-country-list";
+
 const HeroSection = styled(Box)(({ theme }) => ({
   backgroundImage: `url(./shop.png)`,
   backgroundSize: "cover",
@@ -30,6 +31,7 @@ const HeroSection = styled(Box)(({ theme }) => ({
   color: theme.palette.common.black,
   textAlign: "center",
 }));
+
 const StyledButton = styled(Button)(({ theme }) => ({
   borderRadius: "5px",
   width: "50%",
@@ -43,26 +45,79 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
   color: theme.palette.common.black,
 }));
+
 function CheckOut() {
   const theme = createTheme();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod"); // Default payment method
+  const [formValues, setFormValues] = useState({
+    firstName: "",
+    lastName: "",
+    companyName: "",
+    country: null,
+    address: "",
+    city: "",
+    province: "",
+    zipCode: "",
+    email: "",
+    additionalInfo: "",
+    cardNumber: "",
+  });
+  const [errors, setErrors] = useState({});
   const cartItems = useSelector(selectCartItems);
-  const dispatch = useDispatch();
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Handle form submission logic here
-    setSnackbarOpen(true);
-  };
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
-  // Calculate total price
+
   const totalPrice = cartItems.reduce(
     (acc, item) => acc + item.discountPrice * item.quantity,
     0
   );
+
+  const options = useMemo(() => countryList().getData(), []);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate required fields
+    for (const [key, value] of Object.entries(formValues)) {
+      if (!value && key !== "companyName" && key !== "additionalInfo") {
+        newErrors[key] = "This field is required";
+      }
+    }
+
+    // Validate card number only if payment method is bank transfer
+    if (paymentMethod === "bank_transfer" && !formValues.cardNumber) {
+      newErrors.cardNumber = "Card number is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Clear card number and errors on payment method change if switching to COD
+  const handlePaymentMethodChange = (e) => {
+    setPaymentMethod(e.target.value);
+    if (e.target.value === "cod") {
+      setFormValues({ ...formValues, cardNumber: "" });
+      setErrors((prevErrors) => ({ ...prevErrors, cardNumber: undefined }));
+    }
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log("Form submitted"); // Debugging line
+    console.log("Payment Method:", paymentMethod); // Log payment method
+    console.log("Form Values:", formValues); // Log form values
+    if (validateForm()) {
+      // Assuming validation passed
+      setSnackbarOpen(true);
+      console.log("Order placed"); // This should show in the console
+    } else {
+      console.log("Validation failed", errors); // Log errors if validation fails
+    }
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -99,12 +154,9 @@ function CheckOut() {
           </Typography>
         </Box>
       </HeroSection>
-      {/*  checkout page components */}
-      <Box
-        sx={{
-          display: "flex",
-        }}
-      >
+
+      {/* Checkout page components */}
+      <Box sx={{ display: "flex" }}>
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -115,38 +167,117 @@ function CheckOut() {
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <TextField label="First Name" fullWidth required />
+              <TextField
+                label="First Name"
+                fullWidth
+                required
+                value={formValues.firstName}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, firstName: e.target.value })
+                }
+                error={!!errors.firstName}
+                helperText={errors.firstName}
+              />
             </Grid>
             <Grid item xs={6}>
-              <TextField label="Last Name" fullWidth required />
+              <TextField
+                label="Last Name"
+                fullWidth
+                required
+                value={formValues.lastName}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, lastName: e.target.value })
+                }
+                error={!!errors.lastName}
+                helperText={errors.lastName}
+              />
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Company Name (optional)" fullWidth />
+              <TextField
+                label="Company Name (optional)"
+                fullWidth
+                value={formValues.companyName}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, companyName: e.target.value })
+                }
+              />
             </Grid>
             <Grid item xs={12}>
-              <Select fullWidth defaultValue="">
-                <MenuItem value="" disabled>
-                  Select Country
-                </MenuItem>
-                <MenuItem value="USA">USA</MenuItem>
-                <MenuItem value="Canada">Canada</MenuItem>
-                {/* Add more countries as needed */}
-              </Select>
+              <Select
+                options={options}
+                value={formValues.country}
+                onChange={(selectedOption) =>
+                  setFormValues({ ...formValues, country: selectedOption })
+                }
+                placeholder="Select Country"
+              />
+              {errors.country && (
+                <Typography color="error">{errors.country}</Typography>
+              )}
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Street Address" fullWidth required />
+              <TextField
+                label="Street Address"
+                fullWidth
+                required
+                value={formValues.address}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, address: e.target.value })
+                }
+                error={!!errors.address}
+                helperText={errors.address}
+              />
             </Grid>
             <Grid item xs={6}>
-              <TextField label="Town/City" fullWidth required />
+              <TextField
+                label="Town/City"
+                fullWidth
+                required
+                value={formValues.city}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, city: e.target.value })
+                }
+                error={!!errors.city}
+                helperText={errors.city}
+              />
             </Grid>
             <Grid item xs={6}>
-              <TextField label="Province" fullWidth required />
+              <TextField
+                label="Province"
+                fullWidth
+                required
+                value={formValues.province}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, province: e.target.value })
+                }
+                error={!!errors.province}
+                helperText={errors.province}
+              />
             </Grid>
             <Grid item xs={6}>
-              <TextField label="Zip Code" required />
+              <TextField
+                label="Zip Code"
+                required
+                value={formValues.zipCode}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, zipCode: e.target.value })
+                }
+                error={!!errors.zipCode}
+                helperText={errors.zipCode}
+              />
             </Grid>
             <Grid item xs={6}>
-              <TextField label="Email" type="email" required />
+              <TextField
+                label="Email"
+                type="email"
+                required
+                value={formValues.email}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, email: e.target.value })
+                }
+                error={!!errors.email}
+                helperText={errors.email}
+              />
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -154,9 +285,65 @@ function CheckOut() {
                 multiline
                 rows={4}
                 fullWidth
+                value={formValues.additionalInfo}
+                onChange={(e) =>
+                  setFormValues({
+                    ...formValues,
+                    additionalInfo: e.target.value,
+                  })
+                }
               />
             </Grid>
+            <Grid item xs={12}>
+              <Typography variant="body1" gutterBottom>
+                Payment Details
+              </Typography>
+            </Grid>
           </Grid>
+
+          <FormControl component="fieldset" sx={{ marginTop: 4 }}>
+            <RadioGroup
+              value={paymentMethod}
+              onChange={handlePaymentMethodChange}
+            >
+              <FormControlLabel
+                value="cod"
+                control={<Radio />}
+                label="Cash on Delivery"
+              />
+              <FormControlLabel
+                value="bank_transfer"
+                control={<Radio />}
+                label="Bank Transfer"
+              />
+            </RadioGroup>
+
+            {paymentMethod === "bank_transfer" && (
+              <TextField
+                label="Card Number"
+                type="text"
+                fullWidth
+                sx={{ marginTop: 2 }}
+                value={formValues.cardNumber}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, cardNumber: e.target.value })
+                }
+                error={!!errors.cardNumber}
+                helperText={errors.cardNumber}
+              />
+            )}
+          </FormControl>
+          <Box sx={{ marginTop: 4 }}>
+            <StyledButton
+              type="submit"
+              variant="outlined"
+              color="primary"
+              sx={{ marginTop: 4 }}
+              disabled={cartItems.length === 0}
+            >
+              Place Order
+            </StyledButton>
+          </Box>
         </Box>
 
         <Box
@@ -185,10 +372,20 @@ function CheckOut() {
               sx={{ marginBottom: 2 }}
             >
               <Grid item xs={3}>
-                <img src={item.imgSrc} alt={item.name} width="100%" />
+                <img
+                  src={item.thumbnail}
+                  alt={item.name}
+                  style={{
+                    width: "100%",
+                    height: "150px", // Set a fixed height
+                    borderRadius: "8px",
+                    objectFit: "cover", // Ensures the image fills the area while maintaining aspect ratio
+                  }}
+                />
               </Grid>
+
               <Grid item xs={6}>
-                <Typography variant="body1">{item.name}</Typography>
+                <Typography variant="body1">{item.title}</Typography>
                 <Typography variant="body2">
                   Price: ${item.discountPrice.toFixed(2)}
                 </Typography>
@@ -201,46 +398,18 @@ function CheckOut() {
           <Typography variant="h6" fontWeight="bold" align="center">
             Total Bill: ${totalPrice.toFixed(2)}
           </Typography>
-          <FormControl component="fieldset" sx={{ marginTop: 4 }}>
-            <RadioGroup
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            >
-              <FormControlLabel
-                value="cod"
-                control={<Radio />}
-                label="Cash on Delivery"
-              />
-              <FormControlLabel
-                value="bank_transfer"
-                control={<Radio />}
-                label="Bank Transfer"
-              />
-            </RadioGroup>
-            {paymentMethod === "bank_transfer" && (
-              <TextField
-                label="Card Number"
-                type="text"
-                fullWidth
-                sx={{ marginTop: 2 }}
-                required
-              />
-            )}
-          </FormControl>
-
-          <StyledButton type="submit" variant="outlined" color="primary">
-            Place Order
-          </StyledButton>
         </Box>
       </Box>
-      {/* Snackbar for feedback */}
+
       <Snackbar
         open={snackbarOpen}
         onClose={handleCloseSnackbar}
         message="Order placed successfully!"
-        autoHideDuration={6000}
-        action={<Close onClick={handleCloseSnackbar} />}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        action={
+          <Button color="inherit" onClick={handleCloseSnackbar}>
+            <Close />
+          </Button>
+        }
       />
     </ThemeProvider>
   );

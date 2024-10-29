@@ -10,9 +10,25 @@ const StyledContainer = styled(Box)(({ theme }) => ({
 }));
 
 const StyledImage = styled("img")({
-  height: "400px",
+  height: "350px",
   objectFit: "cover", // Keep the aspect ratio
+  width: "350px",
+  borderRadius: "10px",
 });
+const StyledButton = styled(Button)(({ theme }) => ({
+  borderRadius: "5px",
+  width: "100%",
+  height: "40px",
+  marginLeft: "1px",
+  borderColor: "#ad8544",
+  marginTop: 10,
+  "&:hover": {
+    backgroundColor: "#ad8544",
+    color: "white",
+  },
+  color: "black",
+  textTransform: "none",
+}));
 
 const ProductDetail = () => {
   const [cartBtn, setCartBtn] = useState("Add to Cart");
@@ -32,40 +48,50 @@ const ProductDetail = () => {
   // Handle cart actions
   const handleCart = (product) => {
     if (cartBtn === "Add to Cart") {
-      dispatch(addItemToCart(product));
+      dispatch(addItemToCart({ ...product, quantity: 1 }));
       setCartBtn("Remove from Cart");
     } else {
       dispatch(removeItemFromCart(product));
       setCartBtn("Add to Cart");
     }
   };
-
+  const renderStars = (numStars) => {
+    return Array.from({ length: 5 }, (_, index) => (
+      <span
+        key={index}
+        style={{ color: index < numStars ? "gold" : "lightgray" }}
+      >
+        ★
+      </span>
+    ));
+  };
   return (
     <StyledContainer>
       <Grid container spacing={2}>
         <Grid item md={6} container justifyContent="center">
           {/* Use imgSrc field for the product image */}
-          <StyledImage src={product.imgSrc} alt={product.name} />
+          <StyledImage src={product.thumbnail} alt={product.title} />
         </Grid>
         <Grid item md={6} container direction="column" justifyContent="center">
           <Typography variant="h2" component="h1" gutterBottom>
-            {product.name}
+            {product.title}
           </Typography>
           <Typography variant="h5" color="text.secondary" my={2}>
             {/* Display price if it exists, otherwise show discount price */}
             {product.discountPrice
-              ? `$${product.discountPrice}`
-              : `$${product.price}`}
+              ? `Price: ${product.discountPrice} rs`
+              : `Price: ${product.price} rs`}
+          </Typography>
+          <Typography variant="h6" color="text.secondary">
+            Likes: {product.likes}
+          </Typography>
+          <Typography variant="h6" color="text.secondary">
+            Rating: {renderStars(product.stars)} {/* Render the stars here */}
           </Typography>
           <Typography variant="body">{product.description}</Typography>
-          <Button
-            onClick={() => handleCart(product)}
-            variant="outlined"
-            color="primary"
-            sx={{ mt: 3 }} // margin-top for spacing
-          >
+          <StyledButton onClick={() => handleCart(product)} variant="outlined">
             {cartBtn}
-          </Button>
+          </StyledButton>
         </Grid>
       </Grid>
     </StyledContainer>

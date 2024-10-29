@@ -20,6 +20,8 @@ import {
 } from "../redux/cartSlice";
 import { Delete } from "@mui/icons-material";
 
+const theme = createTheme();
+
 const HeroSection = styled(Box)(({ theme }) => ({
   backgroundImage: `url(./shop.png)`,
   backgroundSize: "cover",
@@ -68,15 +70,45 @@ const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
 }));
 
+const ItemContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  padding: theme.spacing(2),
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: theme.spacing(5),
+  margin: theme.spacing(2, 10),
+  width: "45%",
+  borderBottom: "1px solid #ccc",
+  borderRadius: "8px",
+}));
+
+const ImageBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "300px",
+  height: "100px",
+  borderRadius: "8px",
+  overflow: "hidden",
+  position: "relative",
+  textAlign: "center",
+}));
+
+const StyledImage = styled("img")({
+  width: "50%", // Use full width of the box
+  height: "100%", // Use full height of the box
+  objectFit: "cover", // Cover to maintain aspect ratio
+});
+
+const TitleTypography = styled(Typography)({
+  width: "50%",
+});
+
 function Cart() {
-  const theme = createTheme();
   const cartItems = useSelector(selectCartItems);
   const dispatch = useDispatch();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [quantities, setQuantities] = useState(
-    cartItems.reduce((acc, item) => ({ ...acc, [item.id]: 1 }), {})
-  );
 
   const handleRemoveItem = (itemId) => {
     dispatch(removeItemFromCart(itemId));
@@ -87,6 +119,7 @@ function Cart() {
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
+
   const totalPrice = cartItems.reduce(
     (acc, item) => acc + item.discountPrice * item.quantity,
     0
@@ -128,11 +161,7 @@ function Cart() {
         </Box>
       </HeroSection>
 
-      <Box
-        sx={{
-          display: "flex",
-        }}
-      >
+      <Box sx={{ display: "flex" }}>
         <StyledBox>
           <Typography variant="h6" fontWeight="bold">
             Product
@@ -177,45 +206,15 @@ function Cart() {
         </Box>
       ) : (
         cartItems.map((item) => (
-          <Box
-            key={item.id}
-            sx={{
-              display: "flex",
-              padding: theme.spacing(2),
-              justifyContent: "space-between",
-              alignItems: "center",
-              margin: theme.spacing(2, 20),
-              width: "45%",
-              borderBottom: "1px solid #ccc",
-              borderRadius: "8px",
-            }}
-          >
-            {/* Product Image and Name */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: theme.spacing(2),
-                width: "40%",
-              }}
-            >
-              <Box
-                component="img"
-                src={item.imgSrc}
-                alt={item.name}
-                sx={{
-                  width: "100px",
-                  height: "100px",
-                  borderRadius: "8px",
-                  objectFit: "cover",
-                }}
-              />
-              <Typography variant="h6">{item.name}</Typography>
-            </Box>
+          <ItemContainer key={item.id}>
+            <ImageBox>
+              <StyledImage src={item.thumbnail} alt={item.title} />
+              <TitleTypography variant="h6">{item.title}</TitleTypography>
+            </ImageBox>
 
             {/* Price */}
             <Typography variant="h6" sx={{ minWidth: "80px" }}>
-              ${item.discountPrice.toFixed(2)}
+              Rs: {item.discountPrice.toFixed(2)}
             </Typography>
 
             {/* Quantity TextField */}
@@ -237,10 +236,10 @@ function Cart() {
             {/* Remove Button */}
             <Tooltip title="Delete">
               <IconButton onClick={() => handleRemoveItem(item.id)}>
-                <Delete />
+                <Delete sx={{ color: "#e6d6bc" }} />
               </IconButton>
             </Tooltip>
-          </Box>
+          </ItemContainer>
         ))
       )}
 

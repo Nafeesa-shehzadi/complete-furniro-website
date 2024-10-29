@@ -1,4 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchProducts,
+  selectDisplayedProducts,
+  loadMoreProducts,
+} from "../redux/productSlice"; // Adjust the import path as necessary
 import {
   Box,
   Typography,
@@ -6,17 +12,22 @@ import {
   Grid,
   CardContent,
   IconButton,
+  CircularProgress,
+  Snackbar,
+  Badge,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+
 import { styled } from "@mui/material/styles";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward"; // Import the arrow icon
 import ShareIcon from "@mui/icons-material/Share";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { useSelector } from "react-redux";
 import { selectProducts } from "../redux/productSlice";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"; // Outlined icon for hollow like
-
-// Styled Item component for images
+import { selectCartItems, addItemToCart } from "../redux/cartSlice";
+import { useNavigate } from "react-router-dom";
+// Styled components definitions...
 const Item = styled(Box)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   overflow: "hidden",
@@ -32,7 +43,7 @@ const HeroContainer = styled(Box)(({ theme }) => ({
   backgroundImage: "url(./hero.jpg)",
   backgroundSize: "cover",
   backgroundPosition: "center",
-  height: "100vh", // Full height of the viewport
+  height: "90vh", // Full height of the viewport
   display: "flex",
   alignItems: "center", // Center the content vertically
   justifyContent: "flex-end", // Align content to the right horizontally
@@ -41,14 +52,13 @@ const HeroContainer = styled(Box)(({ theme }) => ({
 const HeroSection = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column", // Stack content vertically
-
-  padding: theme.spacing(4), // Add padding for spacing inside the box
+  padding: theme.spacing(3), // Add padding for spacing inside the box
   backgroundColor: "#ede6ca",
   color: theme.palette.common.black,
-  width: "40%", // Set the width of the HeroSection
+  width: "35%", // Set the width of the HeroSection
   maxWidth: "500px", // Ensure it doesn't exceed 400px
   height: "auto", // Automatically adjust height based on content
-  marginRight: theme.spacing(10), // Space from the right side
+  marginRight: theme.spacing(6), // Space from the right side
   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // Optional box-shadow for effect
   borderRadius: "10px", // Rounded corners
 }));
@@ -59,7 +69,7 @@ const ProductBox = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  padding: theme.spacing(2),
+  padding: theme.spacing(5, 20),
   gap: theme.spacing(2),
 }));
 // Styled components
@@ -71,6 +81,7 @@ const StyledCard = styled("div")({
     opacity: 1, // Show on hover
   },
   borderRadius: "10px",
+  width: "200px",
 });
 
 const StyledImageContainer = styled("div")({
@@ -80,12 +91,17 @@ const StyledImageContainer = styled("div")({
 
 const StyledImage = styled("img")({
   width: "100%",
+  maxWidth: "200px",
+  height: "300px",
+  display: "block",
+});
+const StyledImageCategory = styled("img")({
+  width: "100%",
   maxWidth: "400px",
   height: "auto",
   display: "block",
   margin: "0 auto",
 });
-
 const Overlay = styled("div")({
   position: "absolute",
   top: 0,
@@ -100,7 +116,7 @@ const Overlay = styled("div")({
 
 const AddToCartButton = styled(Button)(({ theme }) => ({
   position: "absolute",
-  bottom: "100px",
+  bottom: "90px",
   left: "50%",
   transform: "translateX(-50%)",
   opacity: 0, // Hidden initially
@@ -108,7 +124,6 @@ const AddToCartButton = styled(Button)(({ theme }) => ({
   backgroundColor: theme.palette.common.white,
   color: theme.palette.warning.main, // Yellow text
   "&:hover": {
-    backgroundColor: theme.palette.common.black,
     color: theme.palette.warning.main, // Keep yellow text on hover
   },
 }));
@@ -123,7 +138,7 @@ const IconRow = styled(Box)({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  gap: "20px",
+  gap: "1px",
   color: "white", // Set icon and text color to white
 });
 
@@ -146,49 +161,71 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
   width: "10rem",
   marginTop: theme.spacing(3),
+  textTransform: "none",
 }));
 
 const StyledDesignSection = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  gap: theme.spacing(2),
+  gap: theme.spacing(1),
   backgroundColor: "#faf5d2",
   height: "75vh",
   maxWidth: "100%",
   overflow: "hidden",
 }));
 const StyledImageroom = styled("img")(({ theme }) => ({
-  width: "350px",
-  height: "500px",
+  width: "400px",
+  height: "400px",
   objectFit: "contain",
 }));
 const StyledImageroom2 = styled("img")(({ theme }) => ({
-  width: "350px",
-  height: "400px",
-  objectFit: "contain",
+  width: "400px",
+  height: "350px",
+  objectFit: "cover",
+  marginLeft: theme.spacing(0.1), // Align right to fit next to the design section
 }));
 // Styled component for the dots
 const DotContainer = styled(Box)(({ theme }) => ({
   display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
+  justifyContent: "left",
+  alignItems: "flex-start",
   marginTop: theme.spacing(1),
-  gap: "0.5rem",
+  gap: theme.spacing(1),
+  paddingLeft: theme.spacing(5),
+  cursor: "pointer",
 }));
 
 const Dot = styled("span")(({ active }) => ({
-  width: active ? "12px" : "10px",
-  height: active ? "12px" : "10px",
+  display: "inline-block",
+  width: "10px",
+  height: "10px",
   borderRadius: "50%",
   backgroundColor: active ? "#ccbe66" : "#d3d3d3",
-  border: active ? "2px solid #ccbe66" : "none",
+  border: "2px solid",
+  borderColor: active ? "#ccbe66" : "#d3d3d3",
+  position: "relative",
+  transition: "all 0.3s ease",
+
+  "&::after": {
+    content: '""',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    width: active ? "6px" : "0px",
+    height: active ? "6px" : "0px",
+    borderRadius: "50%",
+    backgroundColor: "#ccbe66",
+    transform: "translate(-50%, -50%)",
+    transition: "all 0.3s ease",
+  },
 }));
+
 const OverlayBox = styled(Box)(({ theme }) => ({
   position: "absolute",
-  top: 350,
-  left: 30,
+  top: 250,
+  left: 70,
   right: "auto", // Keep right auto to allow the button to fit next to it
-  bottom: 40,
+  bottom: 60,
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
@@ -205,7 +242,7 @@ const OverlayTitle = styled(Typography)(({ theme }) => ({
 }));
 
 const OverlaySubtitle = styled(Typography)(({ theme }) => ({
-  fontSize: "2rem",
+  fontSize: "1.5rem",
   fontWeight: "bold",
   marginTop: theme.spacing(1),
 }));
@@ -218,10 +255,10 @@ const Line = styled("hr")(({ theme }) => ({
 }));
 const OverlayButton = styled(Button)(({ theme }) => ({
   position: "absolute",
-  top: 420,
-  left: 230,
+  top: 350,
+  left: 220,
   right: "auto", // Keep right auto to allow the button to fit next to it
-  bottom: 40,
+  bottom: 20,
   backgroundColor: "#ccbe66", // Yellow background for the button
   color: "white",
   "&:hover": {
@@ -232,15 +269,50 @@ const SetupSection = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  gap: theme.spacing(3),
+  gap: theme.spacing(2),
   flexDirection: "column",
   margin: theme.spacing(5, 0),
 }));
-function Home() {
-  const products = useSelector(selectProducts);
-  const [visibleCount, setVisibleCount] = useState(8);
-  // Like state for each product
-  const [likedItems, setLikedItems] = useState({});
+// Define your badge with circle shape, background color, and centered text
+const StyledBadge = styled(Badge)(({ theme, isNew }) => ({
+  position: "absolute",
+  top: "10px",
+  right: "10px",
+  padding: "15px 10px",
+  color: "white",
+  backgroundColor: isNew ? "green" : "red", // Green for new, red for discount
+  borderRadius: "50%",
+  fontWeight: "bold",
+  fontSize: "0.8rem",
+}));
+
+const Home = () => {
+  const dispatch = useDispatch();
+  const products = useSelector(selectDisplayedProducts);
+  const status = useSelector((state) => state.products.status);
+  const error = useSelector((state) => state.products.error);
+  const [visibleCount, setVisibleCount] = useState(10);
+  const [likedItems, setLikedItems] = useState({}); // Move useState here
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const cartItems = useSelector(selectCartItems); // Access cart items using the selector
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status === "idle") {
+      dispatch(fetchProducts());
+    }
+  }, [status, dispatch]);
+
+  if (status === "loading") {
+    return <CircularProgress />;
+  }
+
+  if (status === "failed") {
+    return <Typography color="error">Error: {error}</Typography>;
+  }
+
   // Sample image data (could be fetched from Redux store)
   const images = [
     { id: 1, src: "/set9.png", title: "Image 1" },
@@ -251,6 +323,7 @@ function Home() {
     { id: 6, src: "/set6.png", title: "Image 6" },
     { id: 7, src: "/set7.png", title: "Image 7" },
   ];
+
   const roomImages = [
     { src: "/room1.png", title: "Bedroom", subtitle: "Inner Peace" },
     { src: "/room2.png", title: "Living Room", subtitle: "Cozy Vibes" },
@@ -258,18 +331,16 @@ function Home() {
     { src: "/set3.png", title: "Living", subtitle: "Modern Style" },
   ];
 
-  // Function to handle like toggle
   const handleLikeToggle = (productId) => {
     setLikedItems((prevLikedItems) => ({
       ...prevLikedItems,
       [productId]: !prevLikedItems[productId], // Toggle the liked state
     }));
   };
-  // Function to load more products
+
   const loadMore = () => {
-    setVisibleCount((prevCount) => Math.min(prevCount + 4, products.length)); // Show 4 more products or max available
+    setVisibleCount((prevCount) => Math.min(prevCount + 5, products.length)); // Show 4 more products or max available
   };
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleNextImage = () => {
     if (currentImageIndex < roomImages.length - 1) {
@@ -283,22 +354,45 @@ function Home() {
   const handleDotClick = (index) => {
     setCurrentImageIndex(index);
   };
+  const handleAddToCart = (product) => {
+    try {
+      // Check if product is already in cart
+      const isInCart = cartItems.some((item) => item.id === product.id);
+
+      if (isInCart) {
+        setSnackbarMessage(`Item is already in the cart!`);
+      } else {
+        dispatch(addItemToCart({ ...product, quantity: 1 }));
+
+        setSnackbarMessage(`${product.title} added to cart!`);
+      }
+      setSnackbarOpen(true); // Show snackbar
+    } catch (error) {
+      setSnackbarMessage("Failed to add item to cart.");
+      setSnackbarOpen(true);
+    }
+  };
+  const handleSnackbarClose = () => setSnackbarOpen(false);
+
+  const handleShopNowClick = () => {
+    navigate("/shop");
+  };
   return (
     <div>
       <HeroContainer>
         <HeroSection>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h6" gutterBottom>
             New Arrival
           </Typography>
           <Typography
-            variant="h2"
+            variant="h4"
             gutterBottom
             color="#a37821"
             fontWeight="bold"
           >
             Discover Our New Collection
           </Typography>
-          <Typography paragraph>
+          <Typography variant="body1" gutterBottom>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ac
             velit vitae lectus lobortis scelerisque.
           </Typography>
@@ -308,31 +402,39 @@ function Home() {
               backgroundColor: "#a37821",
               color: "#fff",
               borderRadius: "none",
+              width: "200px",
+              height: "50px",
+              "&:hover": {
+                backgroundColor: "#906622",
+              },
             }}
+            onClick={handleShopNowClick}
           >
             Shop Now
           </Button>
         </HeroSection>
       </HeroContainer>
-      ;
+
       <ProductBox>
-        <Typography variant="h4">Browse the range</Typography>
-        <Typography variant="body1">Discover amazing range!</Typography>
+        <Typography variant="h4" fontWeight="bold">
+          Browse the range
+        </Typography>
+        <Typography variant="h6">Discover amazing range!</Typography>
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6} md={4}>
-            <StyledImage src="/dining.png" alt="Dining" />
+            <StyledImageCategory src="/dining.png" alt="Dining" />
             <Typography variant="h6" fontWeight="bold" align="center">
               Dining
             </Typography>{" "}
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
-            <StyledImage src="/living.png" alt="Living" />
+            <StyledImageCategory src="/living.png" alt="Living" />
             <Typography variant="h6" fontWeight="bold" align="center">
               Living
             </Typography>{" "}
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
-            <StyledImage src="/bedroom2.png" alt="Bedroom" />
+            <StyledImageCategory src="/bedroom2.png" alt="Bedroom" />
             <Typography variant="h6" fontWeight="bold" align="center">
               Bedroom
             </Typography>{" "}
@@ -340,99 +442,96 @@ function Home() {
         </Grid>
       </ProductBox>
       <ProductItems>
-        <Grid container spacing={2}>
-          {products.slice(0, visibleCount).map((product) => (
-            <Grid item xs={6} sm={3} key={product.id}>
-              <StyledCard>
-                <StyledImageContainer>
-                  <StyledImage src={product.imgSrc} alt={product.name} />
-                  <Overlay className="overlay" />{" "}
-                  {/* Black overlay with blur effect */}
-                  <AddToCartButton className="add-to-cart-btn">
-                    Add to Cart
-                  </AddToCartButton>
-                  <IconRow className="icon-row">
-                    <IconButton>
-                      <ShareIcon style={{ color: "white" }} />
-                      <Typography
-                        variant="body2"
-                        style={{ color: "white", marginLeft: "8px" }}
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          Our Products
+        </Typography>
+        {products?.length > 0 ? (
+          <Grid container spacing={1}>
+            {products.slice(0, visibleCount).map((product) => {
+              return (
+                <Grid item xs={12} sm={6} md={2.4} key={product.id}>
+                  {" "}
+                  {/* Changed to md={2.4} for 5 items in one row */}
+                  <StyledCard>
+                    <StyledImageContainer>
+                      <StyledBadge isNew={product.isNew}>
+                        {product.isNew ? "New" : "-10%"}
+                      </StyledBadge>
+                      <StyledImage
+                        src={product.thumbnail}
+                        alt={product.title}
+                      />
+                      <Overlay className="overlay" />
+                      <AddToCartButton
+                        className="add-to-cart-btn"
+                        onClick={() => handleAddToCart(product)}
                       >
-                        {" "}
-                        Share
-                      </Typography>
-                    </IconButton>
-
-                    <IconButton>
-                      <CompareArrowsIcon style={{ color: "white" }} />
-                      <Typography
-                        variant="body2"
-                        style={{ color: "white", marginLeft: "8px" }}
-                      >
-                        {" "}
-                        Compare
-                      </Typography>
-                    </IconButton>
-
-                    <IconButton onClick={() => handleLikeToggle(product.id)}>
-                      {likedItems[product.id] ? (
-                        <>
-                          <FavoriteIcon style={{ color: "red" }} />
+                        Add to Cart
+                      </AddToCartButton>
+                      <IconRow className="icon-row">
+                        <IconButton>
+                          <ShareIcon style={{ color: "white" }} />
                           <Typography
                             variant="body2"
                             style={{ color: "white", marginLeft: "8px" }}
                           >
-                            {" "}
-                            Liked
+                            Share
                           </Typography>
-                        </>
-                      ) : (
-                        <>
-                          <FavoriteBorderIcon style={{ color: "white" }} />
+                        </IconButton>
+                        <IconButton>
+                          <CompareArrowsIcon style={{ color: "white" }} />
                           <Typography
                             variant="body2"
                             style={{ color: "white", marginLeft: "8px" }}
                           >
-                            {" "}
-                            Like
+                            Compare
                           </Typography>
-                        </>
-                      )}
-                    </IconButton>
-                  </IconRow>
-                </StyledImageContainer>
-
-                <CardContent
-                  sx={{
-                    backgroundColor: "#c6cccf",
-                  }}
-                >
-                  <Typography variant="h6" fontWeight="bold">
-                    {product.name}
-                  </Typography>
-                  <Typography variant="body2">{product.description}</Typography>
-                  <Typography variant="h6">
-                    Rs:{product.discountPrice}{" "}
-                    <span
-                      sx={{
-                        ml: "50px",
-                      }}
-                    >
-                      Rs:<del>{product.price}</del>
-                    </span>
-                  </Typography>
-                </CardContent>
-              </StyledCard>
-            </Grid>
-          ))}
-        </Grid>
-
-        {/* Show View More button only if there are more products to show */}
-        {visibleCount < products.length && (
-          <StyledButton variant="outlined" onClick={loadMore}>
-            View More
-          </StyledButton>
+                        </IconButton>
+                        <IconButton
+                          onClick={() => handleLikeToggle(product.id)}
+                        >
+                          {likedItems[product.id] ? (
+                            <FavoriteIcon style={{ color: "red" }} />
+                          ) : (
+                            <FavoriteBorderIcon style={{ color: "white" }} />
+                          )}
+                          <Typography
+                            variant="body2"
+                            style={{ color: "white", marginLeft: "8px" }}
+                          >
+                            {likedItems[product.id] ? "Liked" : "Like"}
+                          </Typography>
+                        </IconButton>
+                      </IconRow>
+                    </StyledImageContainer>
+                    <CardContent>
+                      <Typography variant="h6" fontWeight="bold">
+                        {product.title}
+                      </Typography>
+                      <Typography variant="h6">
+                        {product.isNew ? (
+                          `Rs: ${product.price}` // Show only the price if the product is new
+                        ) : (
+                          <>
+                            Rs: {product.discountPrice}{" "}
+                            <span>
+                              Rs: <del>{product.price}</del>
+                            </span>
+                          </>
+                        )}
+                      </Typography>
+                    </CardContent>
+                  </StyledCard>
+                </Grid>
+              );
+            })}
+          </Grid>
+        ) : (
+          <Typography>No products found.</Typography>
         )}
+        <StyledButton onClick={loadMore} variant="contained" sx={{ mt: 2 }}>
+          Show More
+        </StyledButton>
       </ProductItems>
       <StyledDesignSection>
         <Grid
@@ -469,12 +568,12 @@ function Home() {
 
           {/* Second Column: Images with Overlays */}
           <Grid item xs={12} md={6}>
-            <Box sx={{ display: "flex", flexDirection: "row", gap: "1rem" }}>
+            <Box sx={{ display: "flex", flexDirection: "row", gap: "1px" }}>
               {/* First Image with Overlay */}
               <Box sx={{ position: "relative", width: "100%" }}>
                 <StyledImageroom
                   src={roomImages[currentImageIndex].src}
-                  alt={`Room ${currentImageIndex + 1}`}
+                  alt={`Room ${currentImageIndex + 1}`} // Fixed template literal
                 />
                 <OverlayBox>
                   <OverlayTitle sx={{ display: "flex", alignItems: "center" }}>
@@ -498,14 +597,13 @@ function Home() {
 
               {/* Second Image with Overlay */}
               <Box sx={{ position: "relative", width: "100%" }}>
-                {/* Using modulo to ensure we don't go out of bounds */}
                 <StyledImageroom2
                   src={
                     roomImages[(currentImageIndex + 1) % roomImages.length].src
                   }
                   alt={`Room ${
                     ((currentImageIndex + 1) % roomImages.length) + 1
-                  }`} // Adjusted alt text
+                  }`} // Fixed template literal
                 />
 
                 <DotContainer>
@@ -575,8 +673,24 @@ function Home() {
           </Grid>
         </Box>
       </SetupSection>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={5000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        action={
+          <IconButton
+            size="small"
+            color="inherit"
+            onClick={handleSnackbarClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
+      />
     </div>
   );
-}
+};
 
 export default Home;

@@ -23,7 +23,7 @@ const HeroSection = styled(Box)(({ theme }) => ({
 }));
 
 const ContactSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(4, 10),
+  padding: theme.spacing(4, 6),
   display: "flex",
   flexWrap: "wrap",
   flexDirection: "row",
@@ -34,15 +34,15 @@ const ContactForm = styled(Box)(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   gap: theme.spacing(4),
-  padding: theme.spacing(10),
+  padding: theme.spacing(5, 10),
   flexDirection: "column",
   width: "30%",
 }));
 
 const Contactdetails = styled(Box)(({ theme }) => ({
   width: "35%",
-  paddingTop: theme.spacing(10),
-  paddingLeft: theme.spacing(30),
+  paddingTop: theme.spacing(5),
+  paddingLeft: theme.spacing(20),
 }));
 
 const StyledField = styled(TextField)(({ theme }) => ({

@@ -17,13 +17,27 @@ const StyledTitle = styled(Typography)(({ theme }) => ({
   fontWeight: "bold",
   marginBottom: theme.spacing(4),
 }));
+const StyledButton = styled(Button)(({ theme }) => ({
+  borderRadius: "5px",
+  width: "50%",
+  height: "50px",
+  marginLeft: "1px",
+  borderColor: "#ad8544",
+  marginTop: 4,
+  "&:hover": {
+    backgroundColor: "#ad8544",
+    color: "white",
+  },
+  color: "black",
+  textTransform: "none",
+}));
 
 const About = () => {
   return (
     <StyledContainer>
       <Grid container spacing={2}>
         <Grid item md={6}>
-          <StyledTitle variant="h1">About Us</StyledTitle>
+          <StyledTitle variant="h2">About Us</StyledTitle>
           <Typography variant="body1" marginBottom={4}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Nemo
             molestiae earum rem doloremque, nihil delectus ullam error
@@ -40,9 +54,13 @@ const About = () => {
             obcaecati minima?
           </Typography>
           <NavLink to="/contact">
-            <Button variant="outlined" color="primary" sx={{ paddingX: 3 }}>
+            <StyledButton
+              variant="outlined"
+              color="primary"
+              sx={{ paddingX: 3 }}
+            >
               Contact Us
-            </Button>
+            </StyledButton>
           </NavLink>
         </Grid>
         <Grid item md={6} container justifyContent="center">

@@ -10,7 +10,6 @@ import {
   Menu,
   ListItemText,
   Divider,
-  ListItemAvatar,
   Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -44,7 +43,7 @@ const Logo = styled("img")({
 
 const CenterNav = styled(Box)(({ theme }) => ({
   display: "flex",
-  gap: theme.spacing(4),
+  gap: theme.spacing(3),
   alignItems: "center",
   [theme.breakpoints.down("md")]: {
     display: "none", // Hide navigation links on smaller screens
@@ -54,7 +53,7 @@ const CenterNav = styled(Box)(({ theme }) => ({
 
 const RightIcons = styled(Box)(({ theme }) => ({
   display: "flex",
-  gap: theme.spacing(4), // Adjusted gap
+  gap: theme.spacing(3), // Adjusted gap
   alignItems: "center",
   paddingRight: theme.spacing(10), // Adjusted padding
   marginRight: theme.spacing(3),
@@ -149,12 +148,16 @@ export default function Navbar() {
 
         {/* Right - Icons */}
         <RightIcons>
-          <IconButton color="inherit">
-            <PersonOutlineOutlinedIcon />
-          </IconButton>
-          <IconButton color="inherit">
-            <SearchOutlinedIcon />
-          </IconButton>
+          <Link to="/contact" style={{ color: "inherit" }}>
+            <IconButton color="inherit">
+              <PersonOutlineOutlinedIcon />
+            </IconButton>
+          </Link>
+          <Link to="/shop" style={{ color: "inherit" }}>
+            <IconButton color="inherit">
+              <SearchOutlinedIcon />
+            </IconButton>
+          </Link>
           <IconButton color="inherit">
             <FavoriteBorderOutlinedIcon />
           </IconButton>
@@ -164,7 +167,6 @@ export default function Navbar() {
             </Badge>
           </IconButton>
         </RightIcons>
-        {/* Cart Dropdown */}
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -174,7 +176,7 @@ export default function Navbar() {
             variant="h6"
             fontWeight="bold"
             align="center"
-            sx={{ m: 2 }}
+            sx={{ m: 1 }}
           >
             Shopping Cart
           </Typography>
@@ -185,7 +187,7 @@ export default function Navbar() {
           ) : (
             cartItems.map((item) => (
               <CustomMenuItem key={item.id}>
-                <ListItemText primary={item.name} />
+                <ListItemText primary={item.title} />
                 <Typography>${item.discountPrice}</Typography>
                 <IconButton
                   edge="end"
@@ -202,33 +204,33 @@ export default function Navbar() {
           {/* Divider for visual separation */}
           <Divider />
 
-          {/* Total Price */}
+          {/* Total Price and Checkout Button */}
           {cartItems.length > 0 && (
-            <>
-              <CustomMenuItem>
-                <ListItemText primary="Total" />
-                <Typography fontWeight="bold">
-                  ${totalPrice.toFixed(2)}
-                </Typography>
-              </CustomMenuItem>
-              {/* Checkout Button */}
-              <CustomMenuItem>
-                <Link to="/cart" style={{ textDecoration: "none" }}>
-                  <StyledButton variant="outlined">Cart details</StyledButton>
-                </Link>
-                <Link to="/checkout" style={{ textDecoration: "none" }}>
-                  <StyledButton variant="outlined">Checkout now</StyledButton>
-                </Link>
-                <StyledButton
-                  variant="outlined"
-                  color="#ad8544"
-                  onClick={handleClearCart}
-                  style={{ marginLeft: "8px" }} // Optional: Add some space between buttons
-                >
-                  Clear cart
-                </StyledButton>
-              </CustomMenuItem>
-            </>
+            <CustomMenuItem>
+              <ListItemText primary="Total" />
+              <Typography fontWeight="bold">
+                ${totalPrice.toFixed(2)}
+              </Typography>
+            </CustomMenuItem>
+          )}
+
+          {cartItems.length > 0 && (
+            <CustomMenuItem disableRipple>
+              <Link to="/cart" style={{ textDecoration: "none" }}>
+                <StyledButton variant="outlined">Cart details</StyledButton>
+              </Link>
+              <Link to="/checkout" style={{ textDecoration: "none" }}>
+                <StyledButton variant="outlined">Checkout now</StyledButton>
+              </Link>
+              <StyledButton
+                variant="outlined"
+                color="#ad8544"
+                onClick={handleClearCart}
+                style={{ marginLeft: "8px" }} // Optional: Add some space between buttons
+              >
+                Clear cart
+              </StyledButton>
+            </CustomMenuItem>
           )}
         </Menu>
       </StyledToolbar>

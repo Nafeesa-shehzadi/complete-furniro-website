@@ -47,7 +47,7 @@ const FooterLink = styled(Link)(({ theme }) => ({
 const NewsletterInput = styled(TextField)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   marginLeft: theme.spacing(1),
-  width: "50%",
+  width: "70%",
   "&.MuiOutlinedInput-root.MuiOutlinedInput-notchedOutline": {
     borderColor: theme.palette.common.black, // Set the outline color initially
   },
@@ -56,6 +56,12 @@ const NewsletterInput = styled(TextField)(({ theme }) => ({
 const FooterButton = styled(Button)(({ theme }) => ({
   paddingTop: "3rem",
   paddingRight: "5rem",
+  marginLeft: "1px",
+  textDecoration: "underline",
+  textTransform: "none",
+  "&:hover": {
+    textDecoration: "underline",
+  },
 }));
 
 function Footer() {
@@ -96,7 +102,11 @@ function Footer() {
           />
         </Section>
         <Section>
-          <FooterButton variant="standard" size="small">
+          <FooterButton
+            variant="standard"
+            size="large"
+            disabled={NewsletterInput === ""} // Disable if NewsletterInput is empty
+          >
             Subscribe
           </FooterButton>
         </Section>
