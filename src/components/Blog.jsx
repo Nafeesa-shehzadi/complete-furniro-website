@@ -31,21 +31,28 @@ const HeroSection = styled(Box)(({ theme }) => ({
 
 const BlogComsec = styled(Box)(({ theme }) => ({
   display: "flex",
-  flexDirection: "row", // Side-by-side layout
-  justifyContent: "space-between", // Add space between BlogSection and BlogNextSection
-  alignItems: "flex-start", // Align them to the top
+  flexDirection: "row",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
   height: "auto",
   padding: theme.spacing(4),
-  overflowX: "hidden", // Hide horizontal overflow
+  overflowX: "hidden",
   maxWidth: "100%",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column", // Stack on smaller screens
+  },
 }));
+
 const BlogSection = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "flex-start",
   alignItems: "flex-start",
-  width: "55%", // Increase width for main blog section
+  width: "55%", // Default width
   padding: theme.spacing(5),
+  [theme.breakpoints.down("md")]: {
+    width: "100%", // Full width on smaller screens
+  },
 }));
 
 const BlogNextSection = styled(Box)(({ theme }) => ({
@@ -53,26 +60,31 @@ const BlogNextSection = styled(Box)(({ theme }) => ({
   flexDirection: "column",
   justifyContent: "flex-start",
   alignItems: "flex-start",
-  width: "25%", // Adjust width to fit next to BlogSection
+  width: "25%", // Default width
   padding: theme.spacing(3),
+  [theme.breakpoints.down("md")]: {
+    width: "100%", // Full width on smaller screens
+  },
 }));
+
 const Categories = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-start",
   height: "auto",
-  overflowX: "hidden", // Hide horizontal overflow
+  overflowX: "hidden",
   width: "100%",
   padding: theme.spacing(1),
-  gap: theme.spacing(2), // Space between categories
+  gap: theme.spacing(2),
 }));
+
 const CategoryItem = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
-  width: "100%", // Ensures it uses full width
+  width: "100%",
   paddingLeft: theme.spacing(2),
   paddingTop: theme.spacing(2),
-  gap: theme.spacing(8), // Space between category items
+  gap: theme.spacing(8),
 }));
 
 const Recentpost = styled(Box)(({ theme }) => ({
@@ -93,26 +105,29 @@ const RecentPostItem = styled(Box)(({ theme }) => ({
   width: "100%",
   padding: theme.spacing(2),
 }));
+
 const PostImage = styled("img")(({ theme }) => ({
   width: 60,
   height: 60,
 }));
+
 const PostTitle = styled(Typography)(({ theme }) => ({
   fontWeight: "bold",
   variant: "h6",
 }));
+
 const PostTextContainer = styled(Box)(({ theme }) => ({
   marginLeft: theme.spacing(1),
   display: "flex",
   flexWrap: "wrap",
-  gap: theme.spacing(0.5), // Space between text
+  gap: theme.spacing(0.5),
   width: "40%",
   height: "auto",
 }));
 
 const BlogSearch = styled(Box)(({ theme }) => ({
   display: "flex",
-  flexDirection: "Column",
+  flexDirection: "column",
   justifyContent: "flex-start",
   alignItems: "flex-start",
   height: "auto",
@@ -122,17 +137,17 @@ const BlogSearch = styled(Box)(({ theme }) => ({
 }));
 
 const BlogImage = styled("img")(({ theme }) => ({
-  width: "100%", // Corrected to use a single '%' sign
-  height: "auto", // Allow height to adjust based on width
+  width: "100%",
+  height: "auto",
   borderRadius: "10px",
 }));
 
 const IconContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
-  marginTop: theme.spacing(2), // Space above the icons
+  marginTop: theme.spacing(2),
   marginLeft: theme.spacing(0),
-  gap: theme.spacing(7), // Space between icons and text
+  gap: theme.spacing(7),
 }));
 
 const IconWithText = styled(Box)(({ theme }) => ({
@@ -144,8 +159,8 @@ const IconWithText = styled(Box)(({ theme }) => ({
 
 const BlogTitle = styled(Typography)(({ theme }) => ({
   fontWeight: "bold",
-  marginTop: theme.spacing(2), // Space above the title
-  marginBottom: theme.spacing(2), // Space below the title
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(2),
   width: "100%",
   variant: "h4",
   fontSize: 30,
@@ -158,8 +173,8 @@ const BlogContent = styled(Typography)(({ theme }) => ({
 }));
 
 const BlogMore = styled(Typography)(({ theme }) => ({
-  marginBottom: theme.spacing(4), // Space below the content
-  color: theme.palette.primary.main, // Use primary color for the button
+  marginBottom: theme.spacing(4),
+  color: theme.palette.primary.main,
   textDecoration: "underline",
   cursor: "pointer",
   variant: "body2",
@@ -168,17 +183,23 @@ const BlogMore = styled(Typography)(({ theme }) => ({
 const ButtonContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
-  marginTop: theme.spacing(2), // Space above the buttons
+  marginTop: theme.spacing(2),
   marginLeft: theme.spacing(70),
   width: "40%",
-  maxWidth: "100%", // Ensure it doesn't exceed parent width
-  gap: theme.spacing(2), // Space between buttons
+  maxWidth: "100%",
+  gap: theme.spacing(2),
+  [theme.breakpoints.down("md")]: {
+    marginLeft: theme.spacing(0), // Reset margin for smaller screens
+    flexDirection: "column", // Stack buttons vertically on smaller screens
+    alignItems: "center", // Center buttons
+    width: "100%", // Full width on smaller screens
+  },
 }));
 
 const NextButtons = styled(Button)(({ theme }) => ({
-  fontSize: 20, // Increase font size for better visibility
-  backgroundColor: "#e6d6bc", // Use primary color for the button
-  color: theme.palette.common.white, // White text color for a better contrast
+  fontSize: 20,
+  backgroundColor: "#e6d6bc",
+  color: theme.palette.common.white,
   borderRadius: "7px",
 }));
 

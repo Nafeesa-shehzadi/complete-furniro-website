@@ -30,6 +30,7 @@ import {
   Snackbar,
   Badge,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const itemsPerPage = 8; // Fixed number of items per page
 
@@ -43,26 +44,32 @@ const HeroSection = styled(Box)(({ theme }) => ({
   justifyContent: "center",
   color: theme.palette.common.black,
   textAlign: "center",
+  margin: 0, // Ensure there's no margin around this section
+  padding: 0, // Ensure there's no padding around this section
 }));
 
 const SearchSection = styled(Box)(({ theme }) => ({
   display: "flex",
-  justifyContent: "center",
+  justifyContent: "space-between", // Adjusted for better spacing on small screens
   alignItems: "center",
   backgroundColor: "#f2edda",
   flexDirection: "row",
-  gap: theme.spacing(3),
-  padding: theme.spacing(0, 20), // Default padding for larger screens
+  gap: theme.spacing(2), // Reduced gap for better fitting on smaller screens
+  padding: theme.spacing(2), // Default padding for smaller screens
   height: "15vh",
+  marginTop: 0, // Ensure there's no margin around this section
 
-  [theme.breakpoints.down("lg")]: {
-    padding: theme.spacing(0, 15), // Adjust padding for large screens
-  },
-  [theme.breakpoints.down("md")]: {
-    padding: theme.spacing(0, 10), // Adjust padding for medium screens
-  },
   [theme.breakpoints.down("sm")]: {
     padding: theme.spacing(0, 5), // Adjust padding for small screens
+  },
+  [theme.breakpoints.up("md")]: {
+    padding: theme.spacing(0, 10), // Padding for medium screens
+  },
+  [theme.breakpoints.up("lg")]: {
+    padding: theme.spacing(0, 15), // Padding for large screens
+  },
+  [theme.breakpoints.up("xl")]: {
+    padding: theme.spacing(0, 20), // Padding for extra-large screens
   },
 }));
 
@@ -369,7 +376,7 @@ function Shop() {
             ),
           }}
         />
-        <FormControl variant="outlined">
+        <FormControl variant="outlined" sx={{ minWidth: 60 }}>
           <InputLabel>Sort by</InputLabel>
           <Select
             value={sortOption}
@@ -382,13 +389,19 @@ function Shop() {
             <MenuItem value="za">Z-A</MenuItem>
           </Select>
         </FormControl>
-        <GridViewIcon onClick={() => handleGridChange(6)} />{" "}
-        {/* 2 items per row */}
-        <ViewModuleIcon onClick={() => handleGridChange(3)} />{" "}
-        {/* 4 items per row */}
-        <ViewListIcon onClick={() => handleGridChange(12)} />{" "}
-        {/* 1 item per row */}
-        <FormControl variant="outlined">
+        <GridViewIcon
+          onClick={() => handleGridChange(6)}
+          sx={{ display: { xs: "none", sm: "block" } }} // Hide on small screens
+        />
+        <ViewModuleIcon
+          onClick={() => handleGridChange(3)}
+          sx={{ display: { xs: "none", sm: "block" } }} // Hide on small screens
+        />
+        <ViewListIcon
+          onClick={() => handleGridChange(12)}
+          sx={{ display: { xs: "none", sm: "block" } }} // Hide on small screens
+        />
+        <FormControl variant="outlined" sx={{ minWidth: 60 }}>
           <InputLabel>Show</InputLabel>
           <Select
             value={totalDisplayCount}
@@ -401,14 +414,14 @@ function Shop() {
             <MenuItem value={30}>All</MenuItem>
           </Select>
         </FormControl>
-        <Typography>
+        <Typography variant="body2">
           Showing {totalDisplayCount} of {filteredAndSortedProducts.length}{" "}
           items.
         </Typography>
       </SearchSection>
 
       <ProductItems>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} justifyContent="center">
           {displayedProducts.map((product) => (
             <Grid
               item
@@ -571,10 +584,19 @@ function Shop() {
       </Grid2>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onClose={handleSnackbarClose}
         message={snackbarMessage}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        action={
+          <IconButton
+            size="small"
+            color="inherit"
+            onClick={handleSnackbarClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        }
       />
     </ThemeProvider>
   );

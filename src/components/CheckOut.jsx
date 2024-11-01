@@ -11,6 +11,11 @@ import {
   Snackbar,
   OutlinedInput,
   InputLabel,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
@@ -35,11 +40,11 @@ const HeroSection = styled(Box)(({ theme }) => ({
 
 const StyledButton = styled(Button)(({ theme }) => ({
   borderRadius: "5px",
-  width: "50%",
+  width: "100%",
   height: "50px",
   marginLeft: "1px",
   borderColor: "#ad8544",
-  marginTop: 4,
+  marginTop: 10,
   "&:hover": {
     backgroundColor: "#ad8544",
     color: theme.palette.common.white,
@@ -51,7 +56,8 @@ function CheckOut() {
   const theme = createTheme();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod"); // Default payment method
-  const [formValues, setFormValues] = useState({
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const initialFormValues = {
     firstName: "",
     lastName: "",
     companyName: "",
@@ -63,7 +69,8 @@ function CheckOut() {
     email: "",
     additionalInfo: "",
     cardNumber: "",
-  });
+  };
+  const [formValues, setFormValues] = useState(initialFormValues);
   const [errors, setErrors] = useState({});
   const cartItems = useSelector(selectCartItems);
 
@@ -83,7 +90,12 @@ function CheckOut() {
 
     // Validate required fields
     for (const [key, value] of Object.entries(formValues)) {
-      if (!value && key !== "companyName" && key !== "additionalInfo") {
+      if (
+        !value &&
+        key !== "companyName" &&
+        key !== "additionalInfo" &&
+        key !== "cardNumber"
+      ) {
         newErrors[key] = "This field is required";
       }
     }
@@ -98,20 +110,33 @@ function CheckOut() {
   };
 
   const handlePaymentMethodChange = (e) => {
-    setPaymentMethod(e.target.value);
-    if (e.target.value === "cod") {
-      setFormValues({ ...formValues, cardNumber: "" });
+    const selectedMethod = e.target.value;
+    setPaymentMethod(selectedMethod);
+
+    if (selectedMethod === "cod") {
+      // Clear card number and its errors if payment method is COD
+      setFormValues((prevValues) => ({ ...prevValues, cardNumber: "" }));
       setErrors((prevErrors) => ({ ...prevErrors, cardNumber: undefined }));
     }
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handlePlaceOrderClick = () => {
     if (validateForm()) {
-      setSnackbarOpen(true);
+      setDialogOpen(true); // Open confirmation dialog
     }
   };
 
+  const handleConfirmOrder = (event) => {
+    event.preventDefault();
+    setDialogOpen(false);
+    setSnackbarOpen(true); // Show success snackbar
+    setFormValues(initialFormValues);
+    // Here you can add any additional code to process the order
+  };
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
   return (
     <ThemeProvider theme={theme}>
       <HeroSection>
@@ -151,7 +176,6 @@ function CheckOut() {
       <Box sx={{ display: "flex" }}>
         <Box
           component="form"
-          onSubmit={handleSubmit}
           sx={{ marginBottom: 4, padding: 4, width: "40%" }}
         >
           <Typography variant="h4" gutterBottom align="center">
@@ -217,9 +241,15 @@ function CheckOut() {
               <Select
                 options={options}
                 value={formValues.country}
-                onChange={(selectedOption) =>
-                  setFormValues({ ...formValues, country: selectedOption })
-                }
+                onChange={(selectedOption) => {
+                  setFormValues({ ...formValues, country: selectedOption });
+                  if (errors.country) {
+                    setErrors((prevErrors) => ({
+                      ...prevErrors,
+                      country: undefined,
+                    }));
+                  }
+                }}
                 placeholder="Select Country"
               />
               {errors.country && (
@@ -354,48 +384,6 @@ function CheckOut() {
               />
             </Grid>
           </Grid>
-
-          <FormControl component="fieldset" sx={{ marginTop: 4 }}>
-            <RadioGroup
-              value={paymentMethod}
-              onChange={handlePaymentMethodChange}
-            >
-              <FormControlLabel
-                value="cod"
-                control={<Radio />}
-                label="Cash on Delivery"
-              />
-              <FormControlLabel
-                value="bank_transfer"
-                control={<Radio />}
-                label="Bank Transfer"
-              />
-            </RadioGroup>
-
-            {paymentMethod === "bank_transfer" && (
-              <OutlinedInput
-                fullWidth
-                placeholder="Card Number"
-                type="text"
-                sx={{ marginTop: 2 }}
-                value={formValues.cardNumber}
-                onChange={(e) =>
-                  setFormValues({ ...formValues, cardNumber: e.target.value })
-                }
-                error={!!errors.cardNumber}
-              />
-            )}
-          </FormControl>
-          <Box sx={{ marginTop: 4 }}>
-            <StyledButton
-              type="submit"
-              variant="outlined"
-              onClick={handleSubmit}
-              disabled={cartItems.length === 0}
-            >
-              Place Order
-            </StyledButton>
-          </Box>
         </Box>
 
         <Box
@@ -426,8 +414,78 @@ function CheckOut() {
               {totalPrice.toFixed(2)}
             </Typography>
           </Box>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <FormControl component="fieldset" sx={{ marginTop: 4 }}>
+              <RadioGroup
+                value={paymentMethod}
+                onChange={handlePaymentMethodChange}
+              >
+                <FormControlLabel
+                  value="cod"
+                  control={<Radio />}
+                  label="Cash on Delivery"
+                />
+                <FormControlLabel
+                  value="bank_transfer"
+                  control={<Radio />}
+                  label="Bank Transfer"
+                />
+              </RadioGroup>
+
+              {paymentMethod === "bank_transfer" && (
+                <>
+                  <OutlinedInput
+                    fullWidth
+                    required
+                    placeholder="Card Number"
+                    type="text"
+                    sx={{ marginTop: 2 }}
+                    value={formValues.cardNumber}
+                    onChange={(e) =>
+                      setFormValues({
+                        ...formValues,
+                        cardNumber: e.target.value,
+                      })
+                    }
+                    error={!!errors.cardNumber}
+                  />
+                  <Typography variant="body" gutterBottom>
+                    Your personal data will be used to support your experience
+                    throughout this website, to manage access to your account,
+                    and for other purposes described in our privacy policy.
+                  </Typography>
+                </>
+              )}
+            </FormControl>
+          </Box>
+          <StyledButton
+            type="button"
+            variant="outlined"
+            onClick={handlePlaceOrderClick}
+            disabled={cartItems.length === 0}
+            fullWidth
+          >
+            Place Order
+          </StyledButton>
         </Box>
       </Box>
+      <Dialog open={dialogOpen} onClose={handleDialogClose}>
+        <DialogTitle>Confirm Order</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to place this order for a total of $
+            {totalPrice.toFixed(2)}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmOrder} color="primary" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbarOpen}

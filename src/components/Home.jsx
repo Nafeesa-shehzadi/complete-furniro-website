@@ -33,6 +33,15 @@ const HeroContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center", // Center the content vertically
   justifyContent: "flex-end", // Align content to the right horizontally
+  [theme.breakpoints.down("md")]: {
+    // Adjustments for medium and below
+    height: "70vh", // Reduce height on smaller screens
+  },
+  [theme.breakpoints.down("sm")]: {
+    // Adjustments for small and below
+    height: "60vh", // Further reduce height on very small screens
+    justifyContent: "center", // Center content horizontally on small screens
+  },
 }));
 
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -42,25 +51,36 @@ const HeroSection = styled(Box)(({ theme }) => ({
   backgroundColor: "rgb(249, 241, 231)",
   color: theme.palette.common.black,
   width: "35%", // Set the width of the HeroSection
-  maxWidth: "500px", // Ensure it doesn't exceed 400px
+  maxWidth: "500px", // Ensure it doesn't exceed 500px
   height: "auto", // Automatically adjust height based on content
   marginRight: theme.spacing(6), // Space from the right side
   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // Optional box-shadow for effect
   borderRadius: "10px", // Rounded corners
+  [theme.breakpoints.down("md")]: {
+    // Adjustments for medium and below
+    width: "50%", // Adjust width for medium screens
+    marginRight: theme.spacing(4), // Less margin on medium screens
+  },
+  [theme.breakpoints.down("sm")]: {
+    // Adjustments for small and below
+    width: "80%", // Full width on small screens
+    marginRight: 0, // Remove right margin
+    alignItems: "center", // Center content on small screens
+  },
 }));
-
 const ProductBox = styled(Box)(({ theme }) => ({
   margin: theme.spacing(2),
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  padding: theme.spacing(5, 20),
+  padding: theme.spacing(5, 3), // Adjust padding for smaller screens
   gap: theme.spacing(2),
+  [theme.breakpoints.up("md")]: {
+    // Adjustments for medium and above
+    padding: theme.spacing(5, 20), // Larger padding on medium and larger screens
+  },
 }));
-// Styled components
-// Styled components
-
 const StyledImageCategory = styled("img")({
   width: "100%",
   maxWidth: "400px",
@@ -68,18 +88,6 @@ const StyledImageCategory = styled("img")({
   display: "block",
   margin: "0 auto",
 });
-const Overlay = styled("div")({
-  position: "absolute",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  backgroundColor: "rgba(0, 0, 0, 0.5)", // Black overlay with slight transparency
-  backdropFilter: "blur(5px)", // Apply blur effect
-  opacity: 0, // Hidden initially
-  transition: "opacity 0.3s ease-in-out",
-});
-
 const ProductItems = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
@@ -179,19 +187,25 @@ const StyledDesignSection = styled(Box)(({ theme }) => ({
   height: "75vh",
   maxWidth: "100%",
   overflow: "hidden",
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "column", // Stack elements vertically on small screens
+    height: "auto", // Allow height to be auto on smaller screens
+  },
 }));
+
 const StyledImageroom = styled("img")(({ theme }) => ({
   width: "400px",
   height: "400px",
   objectFit: "contain",
 }));
+
 const StyledImageroom2 = styled("img")(({ theme }) => ({
   width: "400px",
   height: "350px",
   objectFit: "cover",
   marginLeft: theme.spacing(0.1), // Align right to fit next to the design section
 }));
-// Styled component for the dots
+
 const DotContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "left",
@@ -231,18 +245,22 @@ const OverlayBox = styled(Box)(({ theme }) => ({
   position: "absolute",
   top: 250,
   left: 70,
-  right: "auto", // Keep right auto to allow the button to fit next to it
+  right: "auto",
   bottom: 60,
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
-  alignItems: "flex-start", // Align items to the left
-  backgroundColor: "rgba(255, 255, 255, 0.4)", // Transparent white background
+  alignItems: "flex-start",
+  backgroundColor: "rgba(255, 255, 255, 0.4)",
   color: "black",
   padding: theme.spacing(1),
   textAlign: "left",
+  [theme.breakpoints.down("sm")]: {
+    top: "50%", // Adjust position for smaller screens
+    left: "25%", // Adjust left position for smaller screens
+  },
 }));
-// Text styling inside the overlay
+
 const OverlayTitle = styled(Typography)(({ theme }) => ({
   fontSize: "1.2rem",
   display: "flex",
@@ -253,25 +271,32 @@ const OverlaySubtitle = styled(Typography)(({ theme }) => ({
   fontWeight: "bold",
   marginTop: theme.spacing(1),
 }));
-// Styled horizontal line to replace dashes
+
 const Line = styled("hr")(({ theme }) => ({
-  width: "50px", // Width of the line
-  height: "2px", // Height of the line (this determines how thick the line appears)
-  backgroundColor: "#000", // Yellow color for the line
-  marginTop: theme.spacing(1.5), // Space between content and line
+  width: "50px",
+  height: "2px",
+  backgroundColor: "#000",
+  marginTop: theme.spacing(1.5),
 }));
+
 const OverlayButton = styled(Button)(({ theme }) => ({
   position: "absolute",
   top: 350,
   left: 220,
-  right: "auto", // Keep right auto to allow the button to fit next to it
+  right: "auto",
   bottom: 20,
-  backgroundColor: "#ccbe66", // Yellow background for the button
+  backgroundColor: "#ccbe66",
   color: "white",
   "&:hover": {
-    backgroundColor: "#b0a054", // Darker shade of yellow on hover
+    backgroundColor: "#b0a054",
+  },
+  [theme.breakpoints.down("sm")]: {
+    top: "83%", // Adjust button position for smaller screens
+    left: "70%", // Center button on smaller screens
+    transform: "translateX(-50%)", // Center horizontally
   },
 }));
+
 const SetupSection = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
@@ -416,7 +441,7 @@ const Home = () => {
               backgroundColor: "#a37821",
               color: "#fff",
               borderRadius: "none",
-              width: "200px",
+              width: "50%",
               height: "50px",
               "&:hover": {
                 backgroundColor: "#906622",

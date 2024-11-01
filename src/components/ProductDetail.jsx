@@ -102,9 +102,7 @@ const ProductDetail = () => {
   if (status === "failed") {
     return <Typography color="error">Error: {error}</Typography>;
   }
-  // Fetch products from Redux state
-  console.log("id", id);
-  console.log("products", products);
+
   const product = products.find((x) => x.id.toString() === id.toString());
 
   if (!product) {
