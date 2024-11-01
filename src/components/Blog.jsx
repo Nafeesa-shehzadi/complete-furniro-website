@@ -286,7 +286,7 @@ function Blog() {
         </HeroSection>
         <BlogComsec>
           <BlogSection>
-            <BlogImage src="Blog.png" alt="blog1" />
+            <BlogImage src="blog.png" alt="blog1" />
             <IconContainer>
               <IconWithText>
                 <PersonOutlineOutlinedIcon />

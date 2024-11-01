@@ -40,15 +40,12 @@ const HeroSection = styled(Box)(({ theme }) => ({
 
 const StyledButton = styled(Button)(({ theme }) => ({
   borderRadius: "5px",
-  width: "100%",
+  width: "50%",
   height: "50px",
   marginLeft: "1px",
-  borderColor: "#ad8544",
+  borderColor: theme.palette.common.black,
   marginTop: 10,
-  "&:hover": {
-    backgroundColor: "#ad8544",
-    color: theme.palette.common.white,
-  },
+
   color: theme.palette.common.black,
 }));
 
@@ -278,7 +275,7 @@ function CheckOut() {
               />
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <InputLabel>Town/City</InputLabel>
               <OutlinedInput
                 fullWidth
@@ -300,7 +297,7 @@ function CheckOut() {
               />
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <InputLabel>Province</InputLabel>
               <OutlinedInput
                 fullWidth
@@ -322,7 +319,7 @@ function CheckOut() {
               />
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <InputLabel>Zip Code</InputLabel>
               <OutlinedInput
                 fullWidth
@@ -345,7 +342,7 @@ function CheckOut() {
               />
             </Grid>
 
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <InputLabel>Email</InputLabel>
               <OutlinedInput
                 fullWidth
@@ -458,15 +455,17 @@ function CheckOut() {
               )}
             </FormControl>
           </Box>
-          <StyledButton
-            type="button"
-            variant="outlined"
-            onClick={handlePlaceOrderClick}
-            disabled={cartItems.length === 0}
-            fullWidth
-          >
-            Place Order
-          </StyledButton>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <StyledButton
+              type="button"
+              variant="outlined"
+              onClick={handlePlaceOrderClick}
+              disabled={cartItems.length === 0}
+              fullWidth
+            >
+              Place Order
+            </StyledButton>
+          </Box>
         </Box>
       </Box>
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
