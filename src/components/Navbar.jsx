@@ -17,6 +17,8 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import MenuIcon from "@mui/icons-material/Menu"; // Import the Hamburger Menu Icon
+import CloseIcon from "@mui/icons-material/Close"; // Import Close Icon
 import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -25,13 +27,13 @@ import {
   clearCart,
 } from "../redux/cartSlice";
 import { Delete } from "@mui/icons-material";
+
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   padding: theme.spacing(1),
   maxWidth: "100%",
-  overflowX: "hidden", // Ensure no horizontal scroll
 }));
 
 const Logo = styled("img")({
@@ -48,53 +50,58 @@ const CenterNav = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down("md")]: {
     display: "none", // Hide navigation links on smaller screens
   },
-  overflowX: "hidden", // Hide horizontal overflow
 }));
 
 const RightIcons = styled(Box)(({ theme }) => ({
   display: "flex",
-  gap: theme.spacing(3), // Adjusted gap
-  alignItems: "center",
+  gap: theme.spacing(3),
   paddingRight: theme.spacing(10), // Adjusted padding
   marginRight: theme.spacing(3),
+
+  alignItems: "center",
+  // Show icons on larger screens and hide them on smaller screens
+  [theme.breakpoints.down("md")]: {
+    display: "none", // Hide icons on smaller screens
+  },
 }));
+
+const MobileIcons = styled(Box)(({ theme }) => ({
+  display: "none",
+  gap: theme.spacing(1),
+  alignItems: "center",
+  [theme.breakpoints.down("md")]: {
+    display: "flex", // Show icons on smaller screens
+  },
+}));
+
 const StyledButton = styled(Button)(({ theme }) => ({
-  marginLeft: "30px",
   borderRadius: "30px",
-  borderColor: "#ad8544", // Set the border color
-  color: "#ad8544", // Set the text color
+  borderColor: "#ad8544",
+  color: "#ad8544",
   "&:hover": {
-    backgroundColor: "#ad8544", // Background color on hover
-    color: "white", // Text color on hover
+    backgroundColor: "#ad8544",
+    color: "white",
   },
   textTransform: "none",
 }));
-const CustomMenuItem = styled(MenuItem)({
-  "&.MuiMenuItem-root": {
-    "&:hover": {
-      backgroundColor: "transparent", // Remove gray hover color
-    },
-    "&.Mui-selected": {
-      backgroundColor: "transparent", // Remove gray background on click/focus
-      "&:hover": {
-        backgroundColor: "transparent", // Prevent background on hover when selected
-      },
-    },
-    "&:active": {
-      backgroundColor: "transparent", // Remove background on active/click state
-    },
+
+const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
+  "&:hover": {
+    backgroundColor: "transparent",
   },
-});
+}));
+
 export default function Navbar() {
-  const location = useLocation(); // Get current route
+  const location = useLocation();
   const [anchorEl, setAnchorEl] = useState(null);
   const cartItems = useSelector(selectCartItems);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dispatch = useDispatch();
-  // Function to apply styles for active and inactive links
+
   const getLinkStyle = (path) => ({
     textDecoration: "none",
-    color: location.pathname === path ? "#ad8544" : "#000", // Active link color
-    fontWeight: location.pathname === path ? "bold" : "normal", // Bold active link
+    color: location.pathname === path ? "#ad8544" : "#000",
+    fontWeight: location.pathname === path ? "bold" : "normal",
   });
 
   const handleCartClick = (event) => {
@@ -104,41 +111,46 @@ export default function Navbar() {
   const handleCartClose = () => {
     setAnchorEl(null);
   };
+
   const handleRemoveItem = (itemId) => {
     dispatch(removeItemFromCart(itemId));
   };
-  // Calculate total price
+
   const totalPrice = cartItems.reduce(
     (acc, item) => acc + item.discountPrice,
     0
   );
+
   const handleClearCart = () => {
     dispatch(clearCart());
+    setAnchorEl(null);
   };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen((prev) => !prev);
+  };
+
   return (
     <AppBar position="static" color="transparent" elevation={0}>
       <StyledToolbar>
-        {/* Left - Logo */}
         <Logo src="/logo.jpg" alt="Logo" />
+
         <CenterNav>
           <Typography variant="h6">
             <Link to="/" style={getLinkStyle("/")}>
               Home
             </Link>
           </Typography>
-
           <Typography variant="h6">
             <Link to="/about" style={getLinkStyle("/about")}>
               About
             </Link>
           </Typography>
-
           <Typography variant="h6">
             <Link to="/shop" style={getLinkStyle("/shop")}>
               Shop
             </Link>
           </Typography>
-
           <Typography variant="h6">
             <Link to="/contact" style={getLinkStyle("/contact")}>
               Contact
@@ -146,9 +158,9 @@ export default function Navbar() {
           </Typography>
         </CenterNav>
 
-        {/* Right - Icons */}
+        {/* Icons that are always displayed on larger screens */}
         <RightIcons>
-          <Link to="/contact" style={{ color: "inherit" }}>
+          <Link to="/blog" style={{ color: "inherit" }}>
             <IconButton color="inherit">
               <PersonOutlineOutlinedIcon />
             </IconButton>
@@ -167,6 +179,52 @@ export default function Navbar() {
             </Badge>
           </IconButton>
         </RightIcons>
+
+        {/* Mobile Icons - shown only on smaller screens */}
+        <MobileIcons>
+          <IconButton onClick={toggleMobileMenu} color="inherit">
+            {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </IconButton>
+        </MobileIcons>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <Box
+            sx={{
+              display: { xs: "block", md: "none" }, // Display on mobile only
+              position: "absolute",
+              top: "64px", // Adjust according to your AppBar height
+              left: 0,
+              right: 0,
+              bgcolor: "background.paper",
+              boxShadow: 2,
+              zIndex: 1000,
+            }}
+          >
+            <MenuItem onClick={toggleMobileMenu}>
+              <Link to="/" style={getLinkStyle("/")}>
+                Home
+              </Link>
+            </MenuItem>
+            <MenuItem onClick={toggleMobileMenu}>
+              <Link to="/about" style={getLinkStyle("/about")}>
+                About
+              </Link>
+            </MenuItem>
+            <MenuItem onClick={toggleMobileMenu}>
+              <Link to="/shop" style={getLinkStyle("/shop")}>
+                Shop
+              </Link>
+            </MenuItem>
+            <MenuItem onClick={toggleMobileMenu}>
+              <Link to="/contact" style={getLinkStyle("/contact")}>
+                Contact
+              </Link>
+            </MenuItem>
+          </Box>
+        )}
+
+        {/* Shopping Cart Menu */}
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
@@ -200,11 +258,7 @@ export default function Navbar() {
               </CustomMenuItem>
             ))
           )}
-
-          {/* Divider for visual separation */}
           <Divider />
-
-          {/* Total Price and Checkout Button */}
           {cartItems.length > 0 && (
             <CustomMenuItem>
               <ListItemText primary="Total" />
@@ -213,18 +267,24 @@ export default function Navbar() {
               </Typography>
             </CustomMenuItem>
           )}
-
           {cartItems.length > 0 && (
             <CustomMenuItem disableRipple>
-              <Link to="/cart" style={{ textDecoration: "none" }}>
+              <Link
+                to="/cart"
+                style={{ textDecoration: "none" }}
+                onClick={handleCartClose}
+              >
                 <StyledButton variant="outlined">Cart details</StyledButton>
               </Link>
-              <Link to="/checkout" style={{ textDecoration: "none" }}>
+              <Link
+                to="/checkout"
+                style={{ textDecoration: "none" }}
+                onClick={handleCartClose}
+              >
                 <StyledButton variant="outlined">Checkout now</StyledButton>
               </Link>
               <StyledButton
                 variant="outlined"
-                color="#ad8544"
                 onClick={handleClearCart}
                 style={{ marginLeft: "8px" }} // Optional: Add some space between buttons
               >

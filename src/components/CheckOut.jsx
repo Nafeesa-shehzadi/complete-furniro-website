@@ -2,7 +2,6 @@ import React, { useState, useMemo } from "react";
 import {
   Box,
   Typography,
-  TextField,
   Button,
   Grid,
   Radio,
@@ -10,6 +9,8 @@ import {
   FormControlLabel,
   FormControl,
   Snackbar,
+  OutlinedInput,
+  InputLabel,
 } from "@mui/material";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
@@ -96,7 +97,6 @@ function CheckOut() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Clear card number and errors on payment method change if switching to COD
   const handlePaymentMethodChange = (e) => {
     setPaymentMethod(e.target.value);
     if (e.target.value === "cod") {
@@ -107,15 +107,8 @@ function CheckOut() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Form submitted"); // Debugging line
-    console.log("Payment Method:", paymentMethod); // Log payment method
-    console.log("Form Values:", formValues); // Log form values
     if (validateForm()) {
-      // Assuming validation passed
       setSnackbarOpen(true);
-      console.log("Order placed"); // This should show in the console
-    } else {
-      console.log("Validation failed", errors); // Log errors if validation fails
     }
   };
 
@@ -155,7 +148,6 @@ function CheckOut() {
         </Box>
       </HeroSection>
 
-      {/* Checkout page components */}
       <Box sx={{ display: "flex" }}>
         <Box
           component="form"
@@ -167,34 +159,52 @@ function CheckOut() {
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <TextField
-                label="First Name"
+              <InputLabel>First Name:</InputLabel>
+              <OutlinedInput
                 fullWidth
-                required
                 value={formValues.firstName}
-                onChange={(e) =>
-                  setFormValues({ ...formValues, firstName: e.target.value })
-                }
+                onChange={(e) => {
+                  const { value } = e.target;
+                  setFormValues((prevValues) => ({
+                    ...prevValues,
+                    firstName: value,
+                  }));
+
+                  // Remove the error for 'firstName' when the input changes
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    firstName: value ? undefined : prevErrors.firstName,
+                  }));
+                }}
                 error={!!errors.firstName}
-                helperText={errors.firstName}
               />
             </Grid>
+
             <Grid item xs={6}>
-              <TextField
-                label="Last Name"
+              <InputLabel>Last Name</InputLabel>
+              <OutlinedInput
                 fullWidth
-                required
                 value={formValues.lastName}
-                onChange={(e) =>
-                  setFormValues({ ...formValues, lastName: e.target.value })
-                }
+                onChange={(e) => {
+                  const { value } = e.target;
+                  setFormValues((prevValues) => ({
+                    ...prevValues,
+                    lastName: value,
+                  }));
+
+                  // Remove the error for 'lastName' when the input changes
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    lastName: value ? undefined : prevErrors.lastName,
+                  }));
+                }}
                 error={!!errors.lastName}
-                helperText={errors.lastName}
               />
             </Grid>
+
             <Grid item xs={12}>
-              <TextField
-                label="Company Name (optional)"
+              <InputLabel>Company Name (optional)</InputLabel>
+              <OutlinedInput
                 fullWidth
                 value={formValues.companyName}
                 onChange={(e) =>
@@ -203,6 +213,7 @@ function CheckOut() {
               />
             </Grid>
             <Grid item xs={12}>
+              <InputLabel>Country</InputLabel>
               <Select
                 options={options}
                 value={formValues.country}
@@ -216,75 +227,123 @@ function CheckOut() {
               )}
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                label="Street Address"
+              <InputLabel>Street Address</InputLabel>
+              <OutlinedInput
                 fullWidth
-                required
                 value={formValues.address}
-                onChange={(e) =>
-                  setFormValues({ ...formValues, address: e.target.value })
-                }
+                onChange={(e) => {
+                  const { value } = e.target;
+                  setFormValues((prevValues) => ({
+                    ...prevValues,
+                    address: value,
+                  }));
+
+                  // Clear the error for 'address' if the input has a value
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    address: value ? undefined : prevErrors.address,
+                  }));
+                }}
                 error={!!errors.address}
-                helperText={errors.address}
               />
             </Grid>
+
             <Grid item xs={6}>
-              <TextField
-                label="Town/City"
+              <InputLabel>Town/City</InputLabel>
+              <OutlinedInput
                 fullWidth
-                required
                 value={formValues.city}
-                onChange={(e) =>
-                  setFormValues({ ...formValues, city: e.target.value })
-                }
+                onChange={(e) => {
+                  const { value } = e.target;
+                  setFormValues((prevValues) => ({
+                    ...prevValues,
+                    city: value,
+                  }));
+
+                  // Clear the error for 'city' if the input has a value
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    city: value ? undefined : prevErrors.city,
+                  }));
+                }}
                 error={!!errors.city}
-                helperText={errors.city}
               />
             </Grid>
+
             <Grid item xs={6}>
-              <TextField
-                label="Province"
+              <InputLabel>Province</InputLabel>
+              <OutlinedInput
                 fullWidth
-                required
                 value={formValues.province}
-                onChange={(e) =>
-                  setFormValues({ ...formValues, province: e.target.value })
-                }
+                onChange={(e) => {
+                  const { value } = e.target;
+                  setFormValues((prevValues) => ({
+                    ...prevValues,
+                    province: value,
+                  }));
+
+                  // Clear the error for 'province' if the input has a value
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    province: value ? undefined : prevErrors.province,
+                  }));
+                }}
                 error={!!errors.province}
-                helperText={errors.province}
               />
             </Grid>
+
             <Grid item xs={6}>
-              <TextField
-                label="Zip Code"
-                required
+              <InputLabel>Zip Code</InputLabel>
+              <OutlinedInput
+                fullWidth
                 value={formValues.zipCode}
-                onChange={(e) =>
-                  setFormValues({ ...formValues, zipCode: e.target.value })
-                }
+                type="Number"
+                onChange={(e) => {
+                  const { value } = e.target;
+                  setFormValues((prevValues) => ({
+                    ...prevValues,
+                    zipCode: value,
+                  }));
+
+                  // Clear the error for 'zipCode' if the input has a value
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    zipCode: value ? undefined : prevErrors.zipCode,
+                  }));
+                }}
                 error={!!errors.zipCode}
-                helperText={errors.zipCode}
               />
             </Grid>
+
             <Grid item xs={6}>
-              <TextField
-                label="Email"
+              <InputLabel>Email</InputLabel>
+              <OutlinedInput
+                fullWidth
                 type="email"
-                required
                 value={formValues.email}
-                onChange={(e) =>
-                  setFormValues({ ...formValues, email: e.target.value })
-                }
+                onChange={(e) => {
+                  const { value } = e.target;
+                  setFormValues((prevValues) => ({
+                    ...prevValues,
+                    email: value,
+                  }));
+
+                  // Clear the error for 'email' if the input has a value
+                  setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    email: value ? undefined : prevErrors.email,
+                  }));
+                }}
                 error={!!errors.email}
-                helperText={errors.email}
               />
             </Grid>
+
             <Grid item xs={12}>
-              <TextField
-                label="Additional Information"
+              <InputLabel>Additional Information</InputLabel>
+              <OutlinedInput
+                fullWidth
                 multiline
                 rows={4}
-                fullWidth
                 value={formValues.additionalInfo}
                 onChange={(e) =>
                   setFormValues({
@@ -293,11 +352,6 @@ function CheckOut() {
                   })
                 }
               />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" gutterBottom>
-                Payment Details
-              </Typography>
             </Grid>
           </Grid>
 
@@ -319,17 +373,16 @@ function CheckOut() {
             </RadioGroup>
 
             {paymentMethod === "bank_transfer" && (
-              <TextField
-                label="Card Number"
-                type="text"
+              <OutlinedInput
                 fullWidth
+                placeholder="Card Number"
+                type="text"
                 sx={{ marginTop: 2 }}
                 value={formValues.cardNumber}
                 onChange={(e) =>
                   setFormValues({ ...formValues, cardNumber: e.target.value })
                 }
                 error={!!errors.cardNumber}
-                helperText={errors.cardNumber}
               />
             )}
           </FormControl>
@@ -337,8 +390,7 @@ function CheckOut() {
             <StyledButton
               type="submit"
               variant="outlined"
-              color="primary"
-              sx={{ marginTop: 4 }}
+              onClick={handleSubmit}
               disabled={cartItems.length === 0}
             >
               Place Order
@@ -348,65 +400,43 @@ function CheckOut() {
 
         <Box
           sx={{
-            padding: 2,
-            width: "40%",
-            marginBottom: 4,
-            display: "flex",
-            flexDirection: "column",
+            marginTop: 4,
+            marginLeft: 3,
+            padding: 4,
+            width: "50%",
           }}
         >
-          <Typography
-            variant="h4"
-            gutterBottom
-            align="center"
-            sx={{ marginTop: 4 }}
-          >
-            Order Summary
+          <Typography variant="h4" gutterBottom>
+            Your Order
           </Typography>
           {cartItems.map((item) => (
-            <Grid
-              container
-              spacing={2}
-              alignItems="center"
+            <Box
               key={item.id}
-              sx={{ marginBottom: 2 }}
+              sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}
             >
-              <Grid item xs={3}>
-                <img
-                  src={item.thumbnail}
-                  alt={item.name}
-                  style={{
-                    width: "100%",
-                    height: "150px", // Set a fixed height
-                    borderRadius: "8px",
-                    objectFit: "cover", // Ensures the image fills the area while maintaining aspect ratio
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={6}>
-                <Typography variant="body1">{item.title}</Typography>
-                <Typography variant="body2">
-                  Price: ${item.discountPrice.toFixed(2)}
-                </Typography>
-                <Typography variant="body2">
-                  Quantity: {item.quantity}
-                </Typography>
-              </Grid>
-            </Grid>
+              <Typography>{item.title}</Typography>
+              <Typography>
+                {item.discountPrice} x {item.quantity}
+              </Typography>
+            </Box>
           ))}
-          <Typography variant="h6" fontWeight="bold" align="center">
-            Total Bill: ${totalPrice.toFixed(2)}
-          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+            <Typography variant="h6">Total:</Typography>
+            <Typography variant="h6" color="#ad8544" fontWeight="bold">
+              {totalPrice.toFixed(2)}
+            </Typography>
+          </Box>
         </Box>
       </Box>
 
       <Snackbar
         open={snackbarOpen}
         onClose={handleCloseSnackbar}
+        autoHideDuration={3000}
         message="Order placed successfully!"
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
         action={
-          <Button color="inherit" onClick={handleCloseSnackbar}>
+          <Button color="inherit" size="small" onClick={handleCloseSnackbar}>
             <Close />
           </Button>
         }

@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchProducts,
-  selectDisplayedProducts,
-  loadMoreProducts,
-} from "../redux/productSlice"; // Adjust the import path as necessary
+import { fetchProducts, selectDisplayedProducts } from "../redux/productSlice"; // Adjust the import path as necessary
 import {
   Box,
   Typography,
   Button,
   Grid,
-  CardContent,
   IconButton,
   CircularProgress,
   Snackbar,
@@ -23,24 +18,15 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward"; // Import the a
 import ShareIcon from "@mui/icons-material/Share";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { selectProducts } from "../redux/productSlice";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"; // Outlined icon for hollow like
 import { selectCartItems, addItemToCart } from "../redux/cartSlice";
 import { useNavigate } from "react-router-dom";
-// Styled components definitions...
-const Item = styled(Box)(({ theme }) => ({
-  borderRadius: theme.shape.borderRadius,
-  overflow: "hidden",
-  boxShadow: theme.shadows[2], // Adds a shadow for depth
-  transition: "transform 0.2s", // Animation for hover effect
-}));
+import Masonry from "@mui/lab/Masonry";
 
-const Image = styled("img")({
-  width: "100%", // Makes image responsive
-  height: "500px", // Maintains aspect ratio
-});
+// Styled components definitions...
+
 const HeroContainer = styled(Box)(({ theme }) => ({
-  backgroundImage: "url(./hero.jpg)",
+  backgroundImage: "url(./home3.png)",
   backgroundSize: "cover",
   backgroundPosition: "center",
   height: "90vh", // Full height of the viewport
@@ -53,7 +39,7 @@ const HeroSection = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column", // Stack content vertically
   padding: theme.spacing(3), // Add padding for spacing inside the box
-  backgroundColor: "#ede6ca",
+  backgroundColor: "rgb(249, 241, 231)",
   color: theme.palette.common.black,
   width: "35%", // Set the width of the HeroSection
   maxWidth: "500px", // Ensure it doesn't exceed 400px
@@ -73,28 +59,8 @@ const ProductBox = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
 }));
 // Styled components
+// Styled components
 
-const StyledCard = styled("div")({
-  position: "relative",
-  overflow: "hidden",
-  "&:hover .add-to-cart-btn, &:hover .icon-row, &:hover .overlay": {
-    opacity: 1, // Show on hover
-  },
-  borderRadius: "10px",
-  width: "200px",
-});
-
-const StyledImageContainer = styled("div")({
-  position: "relative",
-  overflow: "hidden",
-});
-
-const StyledImage = styled("img")({
-  width: "100%",
-  maxWidth: "200px",
-  height: "300px",
-  display: "block",
-});
 const StyledImageCategory = styled("img")({
   width: "100%",
   maxWidth: "400px",
@@ -114,34 +80,6 @@ const Overlay = styled("div")({
   transition: "opacity 0.3s ease-in-out",
 });
 
-const AddToCartButton = styled(Button)(({ theme }) => ({
-  position: "absolute",
-  bottom: "90px",
-  left: "50%",
-  transform: "translateX(-50%)",
-  opacity: 0, // Hidden initially
-  transition: "opacity 0.3s ease-in-out",
-  backgroundColor: theme.palette.common.white,
-  color: theme.palette.warning.main, // Yellow text
-  "&:hover": {
-    color: theme.palette.warning.main, // Keep yellow text on hover
-  },
-}));
-
-const IconRow = styled(Box)({
-  position: "absolute",
-  bottom: "60px",
-  left: "50%",
-  transform: "translateX(-50%)",
-  opacity: 0, // Hidden initially
-  transition: "opacity 0.3s ease-in-out",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  gap: "1px",
-  color: "white", // Set icon and text color to white
-});
-
 const ProductItems = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
@@ -150,6 +88,74 @@ const ProductItems = styled(Box)(({ theme }) => ({
   padding: theme.spacing(10),
   flexDirection: "column",
 }));
+const StyledCard = styled("div")({
+  position: "relative",
+  overflow: "hidden",
+  borderRadius: "10px",
+  width: "200px",
+  cursor: "pointer",
+  "&:hover .hover-content": {
+    opacity: 1, // Show overlay on hover for full card
+  },
+});
+
+const StyledImageContainer = styled("div")({
+  position: "relative",
+  overflow: "hidden",
+  width: "100%",
+  height: "300px",
+});
+
+const HoverContentBox = styled("div")({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.7)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  opacity: 0, // Hidden initially
+  transition: "opacity 0.3s ease-in-out",
+  color: "white",
+});
+
+const AddToCartButton = styled(Button)({
+  backgroundColor: "white",
+  color: "#a37821",
+  marginBottom: "8px", // Adjust as needed for spacing from icons
+});
+
+// Updated IconRow and IconButton styling
+const IconRow = styled(Box)({
+  display: "flex",
+  justifyContent: "center",
+  gap: "4px", // Reduced space between icons and text
+  color: "white",
+});
+
+const SmallIconButton = styled(IconButton)({
+  padding: "4px", // Smaller padding for icons
+  fontSize: "0.75rem", // Smaller font size for text
+  "& .MuiSvgIcon-root": {
+    fontSize: "1rem", // Smaller icon size
+  },
+});
+
+const StyledImage = styled("img")({
+  width: "100%",
+  height: "100%",
+  display: "block",
+});
+
+const CardContentBox = styled(Box)({
+  padding: "16px",
+  "&:hover .hover-content": {
+    opacity: 1, // Ensure hover works on CardContent as well
+  },
+});
 
 const StyledButton = styled(Button)(({ theme }) => ({
   border: "2px solid #ccbe66", // Use the specified hex color for the border
@@ -161,6 +167,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
   width: "10rem",
   marginTop: theme.spacing(3),
+  borderRadius: "0px",
   textTransform: "none",
 }));
 
@@ -280,7 +287,7 @@ const StyledBadge = styled(Badge)(({ theme, isNew }) => ({
   right: "10px",
   padding: "15px 10px",
   color: "white",
-  backgroundColor: isNew ? "green" : "red", // Green for new, red for discount
+  backgroundColor: isNew ? "#30c4ac" : "#ec8484", // Green for new, red for discount
   borderRadius: "50%",
   fontWeight: "bold",
   fontSize: "0.8rem",
@@ -313,23 +320,25 @@ const Home = () => {
     return <Typography color="error">Error: {error}</Typography>;
   }
 
-  // Sample image data (could be fetched from Redux store)
-  const images = [
-    { id: 1, src: "/set9.png", title: "Image 1" },
-    { id: 2, src: "/set2.png", title: "Image 2" },
-    { id: 3, src: "/set3.png", title: "Image 3" },
-    { id: 4, src: "/set4.png", title: "Image 4" },
-    { id: 5, src: "/set5.png", title: "Image 5" },
-    { id: 6, src: "/set6.png", title: "Image 6" },
-    { id: 7, src: "/set7.png", title: "Image 7" },
-  ];
-
   const roomImages = [
     { src: "/room1.png", title: "Bedroom", subtitle: "Inner Peace" },
     { src: "/room2.png", title: "Living Room", subtitle: "Cozy Vibes" },
-    { src: "/set5.png", title: "Kitchen", subtitle: "Modern Style" },
+    { src: "/set4.png", title: "Kitchen", subtitle: "Modern Style" },
     { src: "/set3.png", title: "Living", subtitle: "Modern Style" },
   ];
+  const imagess = Array.from({ length: 16 }, (_, index) => {
+    // Define a pattern of heights to repeat
+    const heightPattern = [400, 350, 250, 150];
+
+    return {
+      id: index + 1,
+      src: `/s${index + 1}.avif`,
+      title: `Image ${index + 1}`,
+      width: Math.floor(Math.random() * (400 - 150 + 1)) + 150, // Random width between 150 and 400
+      height: heightPattern[index % heightPattern.length], // Cycle through height pattern
+      marginTop: index % 2 === 0 ? 0 : Math.floor(Math.random() * 10), // Random marginTop for alternate images
+    };
+  });
 
   const handleLikeToggle = (productId) => {
     setLikedItems((prevLikedItems) => ({
@@ -377,6 +386,11 @@ const Home = () => {
   const handleShopNowClick = () => {
     navigate("/shop");
   };
+
+  const handleCardClick = (productId) => {
+    navigate(`/product/${productId}`);
+  };
+
   return (
     <div>
       <HeroContainer>
@@ -452,7 +466,7 @@ const Home = () => {
                 <Grid item xs={12} sm={6} md={2.4} key={product.id}>
                   {" "}
                   {/* Changed to md={2.4} for 5 items in one row */}
-                  <StyledCard>
+                  <StyledCard onClick={() => handleCardClick(product.id)}>
                     <StyledImageContainer>
                       <StyledBadge isNew={product.isNew}>
                         {product.isNew ? "New" : "-10%"}
@@ -461,66 +475,71 @@ const Home = () => {
                         src={product.thumbnail}
                         alt={product.title}
                       />
-                      <Overlay className="overlay" />
-                      <AddToCartButton
-                        className="add-to-cart-btn"
-                        onClick={() => handleAddToCart(product)}
-                      >
-                        Add to Cart
-                      </AddToCartButton>
-                      <IconRow className="icon-row">
-                        <IconButton>
-                          <ShareIcon style={{ color: "white" }} />
-                          <Typography
-                            variant="body2"
-                            style={{ color: "white", marginLeft: "8px" }}
-                          >
-                            Share
-                          </Typography>
-                        </IconButton>
-                        <IconButton>
-                          <CompareArrowsIcon style={{ color: "white" }} />
-                          <Typography
-                            variant="body2"
-                            style={{ color: "white", marginLeft: "8px" }}
-                          >
-                            Compare
-                          </Typography>
-                        </IconButton>
-                        <IconButton
-                          onClick={() => handleLikeToggle(product.id)}
+                      <HoverContentBox className="hover-content">
+                        <AddToCartButton
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent card click from triggering
+                            handleAddToCart(product);
+                          }}
                         >
-                          {likedItems[product.id] ? (
-                            <FavoriteIcon style={{ color: "red" }} />
-                          ) : (
-                            <FavoriteBorderIcon style={{ color: "white" }} />
-                          )}
-                          <Typography
-                            variant="body2"
-                            style={{ color: "white", marginLeft: "8px" }}
+                          Add to Cart
+                        </AddToCartButton>
+                        <IconRow className="icon-row">
+                          <SmallIconButton>
+                            <ShareIcon style={{ color: "white" }} />
+                            <Typography
+                              variant="caption"
+                              style={{ color: "white" }}
+                            >
+                              Share
+                            </Typography>
+                          </SmallIconButton>
+                          <SmallIconButton>
+                            <CompareArrowsIcon style={{ color: "white" }} />
+                            <Typography
+                              variant="caption"
+                              style={{ color: "white" }}
+                            >
+                              Compare
+                            </Typography>
+                          </SmallIconButton>
+                          <SmallIconButton
+                            onClick={() => handleLikeToggle(product.id)}
                           >
-                            {likedItems[product.id] ? "Liked" : "Like"}
-                          </Typography>
-                        </IconButton>
-                      </IconRow>
+                            {likedItems[product.id] ? (
+                              <FavoriteIcon style={{ color: "red" }} />
+                            ) : (
+                              <FavoriteBorderIcon style={{ color: "white" }} />
+                            )}
+                            <Typography
+                              variant="caption"
+                              style={{ color: "white" }}
+                            >
+                              {likedItems[product.id] ? "Liked" : "Like"}
+                            </Typography>
+                          </SmallIconButton>
+                        </IconRow>
+                      </HoverContentBox>
                     </StyledImageContainer>
-                    <CardContent>
+                    <CardContentBox>
                       <Typography variant="h6" fontWeight="bold">
                         {product.title}
                       </Typography>
-                      <Typography variant="h6">
+                      <Typography variant="body2" fontWeight="bold">
                         {product.isNew ? (
                           `Rs: ${product.price}` // Show only the price if the product is new
                         ) : (
                           <>
                             Rs: {product.discountPrice}{" "}
                             <span>
-                              Rs: <del>{product.price}</del>
+                              <del style={{ color: "rgba(0, 0, 0, 0.5)" }}>
+                                Rs: {product.price}
+                              </del>
                             </span>
                           </>
                         )}
                       </Typography>
-                    </CardContent>
+                    </CardContentBox>
                   </StyledCard>
                 </Grid>
               );
@@ -529,9 +548,11 @@ const Home = () => {
         ) : (
           <Typography>No products found.</Typography>
         )}
-        <StyledButton onClick={loadMore} variant="contained" sx={{ mt: 2 }}>
-          Show More
-        </StyledButton>
+        {visibleCount < products.length && (
+          <StyledButton onClick={loadMore} variant="contained" sx={{ mt: 2 }}>
+            Show More
+          </StyledButton>
+        )}
       </ProductItems>
       <StyledDesignSection>
         <Grid
@@ -595,7 +616,6 @@ const Home = () => {
                 />
               </Box>
 
-              {/* Second Image with Overlay */}
               <Box sx={{ position: "relative", width: "100%" }}>
                 <StyledImageroom2
                   src={
@@ -628,50 +648,25 @@ const Home = () => {
           #FuniroFurniture
         </Typography>
 
-        <Box sx={{ flexGrow: 1 }}>
-          <Grid container spacing={2}>
-            {/* First Row */}
-            <Grid item xs={8}>
-              <Item>
-                <Image src={images[0].src} alt={images[0].alt} />
-              </Item>
-            </Grid>
-            <Grid item xs={4}>
-              <Item>
-                <Image src={images[1].src} alt={images[1].alt} />
-              </Item>
-            </Grid>
-
-            {/* Second Row - Three equal width images */}
-            <Grid item xs={4}>
-              <Item>
-                <Image src={images[2].src} alt={images[2].alt} />
-              </Item>
-            </Grid>
-            <Grid item xs={4}>
-              <Item>
-                <Image src={images[3].src} alt={images[3].alt} />
-              </Item>
-            </Grid>
-            <Grid item xs={4}>
-              <Item>
-                <Image src={images[4].src} alt={images[4].alt} />
-              </Item>
-            </Grid>
-
-            {/* Third Row - Two equal width images */}
-            <Grid item xs={6}>
-              <Item>
-                <Image src={images[5].src} alt={images[5].alt} />
-              </Item>
-            </Grid>
-            <Grid item xs={6}>
-              <Item>
-                <Image src={images[6].src} alt={images[6].alt} />
-              </Item>
-            </Grid>
-          </Grid>
-        </Box>
+        <Masonry columns={{ xs: 2, sm: 3, md: 6 }} spacing={1}>
+          {imagess.map((image) => (
+            <Box
+              key={image.id}
+              sx={{ position: "relative", overflow: "hidden" }}
+            >
+              <img
+                src={image.src}
+                alt={image.title}
+                style={{
+                  width: "100%",
+                  height: image.height,
+                  borderRadius: "5px",
+                  marginTop: image.marginTop,
+                }}
+              />
+            </Box>
+          ))}
+        </Masonry>
       </SetupSection>
       <Snackbar
         open={snackbarOpen}

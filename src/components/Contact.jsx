@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
-import { Box, Button, Typography, TextField, Snackbar } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  TextField,
+  Snackbar,
+  Grid2,
+} from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import { Link } from "react-router-dom";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
@@ -23,10 +30,9 @@ const HeroSection = styled(Box)(({ theme }) => ({
 }));
 
 const ContactSection = styled(Box)(({ theme }) => ({
-  padding: theme.spacing(4, 6),
+  padding: theme.spacing(4),
   display: "flex",
   flexWrap: "wrap",
-  flexDirection: "row",
 }));
 
 const ContactForm = styled(Box)(({ theme }) => ({
@@ -34,14 +40,14 @@ const ContactForm = styled(Box)(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   gap: theme.spacing(4),
-  padding: theme.spacing(5, 10),
+  padding: theme.spacing(5),
   flexDirection: "column",
-  width: "30%",
+  flex: "1 1 300px", // Responsive width
 }));
 
 const Contactdetails = styled(Box)(({ theme }) => ({
-  width: "35%",
-  paddingTop: theme.spacing(5),
+  flex: "1 1 300px", // Responsive width
+  padding: theme.spacing(5),
   paddingLeft: theme.spacing(20),
 }));
 
@@ -70,7 +76,40 @@ const StyledButton = styled(Button)(({ theme }) => ({
     backgroundColor: "#ad8544",
   },
 }));
+const ServiceBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexWrap: "wrap", // Allow items to wrap onto the next line
+  alignItems: "flex-start", // Align items at the start
+  backgroundColor: "#e6d6bc",
+  padding: theme.spacing(10, 2), // Reduce padding to prevent overflow
+  height: "auto",
+  gap: theme.spacing(1), // Space between items
+  overflow: "hidden", // Prevent overflow
+}));
 
+const ServiceImage = styled("img")(({ theme }) => ({
+  width: 60,
+  height: 60,
+  paddingLeft: theme.spacing(5),
+}));
+
+const ServiceTextContainer = styled(Box)(({ theme }) => ({
+  marginLeft: theme.spacing(1),
+  justifyContent: "center",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  paddingTop: theme.spacing(2),
+}));
+
+const ServiceTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: "bold",
+  variant: "h6",
+}));
+
+const ServiceDescription = styled(Typography)(({ theme }) => ({
+  variant: "body2",
+  color: theme.palette.text.secondary,
+}));
 function Contact() {
   const theme = createTheme();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -255,13 +294,38 @@ function Contact() {
           </StyledButton>
         </ContactForm>
       </ContactSection>
+      <Grid2 item xs={12} sm={6}>
+        <ServiceBox>
+          <ServiceImage src="quality.png" alt="logo" />
+          <ServiceTextContainer>
+            <ServiceTitle>High Quality</ServiceTitle>
+            <ServiceDescription>crafted from top materials</ServiceDescription>
+          </ServiceTextContainer>
+          <ServiceImage src="wrnty.png" alt="logo" />
+          <ServiceTextContainer>
+            <ServiceTitle>Warranty Protection</ServiceTitle>
+            <ServiceDescription>over 2 years</ServiceDescription>
+          </ServiceTextContainer>
 
+          <ServiceImage src="shiping.png" alt="logo" />
+          <ServiceTextContainer>
+            <ServiceTitle>Free Shipping</ServiceTitle>
+            <ServiceDescription>order over 150 $</ServiceDescription>
+          </ServiceTextContainer>
+          <ServiceImage src="support.png" alt="logo" />
+          <ServiceTextContainer>
+            <ServiceTitle>24 / 7 Support</ServiceTitle>
+            <ServiceDescription>Dedicated support</ServiceDescription>
+          </ServiceTextContainer>
+        </ServiceBox>
+      </Grid2>
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         message="Your message has been sent!"
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
         action={
           <Button color="inherit" onClick={handleCloseSnackbar}>
             <Close />

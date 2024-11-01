@@ -34,15 +34,23 @@ const HeroSection = styled(Box)(({ theme }) => ({
   textAlign: "center",
 }));
 
+// Parent Wrapper that organizes StyledBox and StyledTotalBox in a row
+const Wrapper = styled(Box)({
+  display: "flex",
+  flexDirection: "row",
+  width: "100%", // Full width for layout flexibility
+  gap: "140px", // Adjust spacing between StyledBox and StyledTotalBox
+});
+
 const StyledBox = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
-  gap: theme.spacing(20),
+  gap: theme.spacing(10),
   padding: theme.spacing(5),
-  margin: theme.spacing(1, 10),
+  margin: theme.spacing(1, 5),
   backgroundColor: "#e6d6bc",
-  width: "50%",
-  height: "10%",
+  width: "90%", // 60% of the parent's width
+  height: "auto", // Adjust height for content as needed
 }));
 
 const StyledTotalBox = styled(Box)(({ theme }) => ({
@@ -51,11 +59,23 @@ const StyledTotalBox = styled(Box)(({ theme }) => ({
   alignItems: "center",
   gap: theme.spacing(5),
   padding: theme.spacing(5),
-  margin: theme.spacing(1, 10),
+  margin: theme.spacing(1, 5),
   backgroundColor: "#e6d6bc",
-  width: "20%",
-  height: "30%",
+  width: "20%", // 20% of the parent's width
+  height: "10%",
   flexDirection: "column",
+}));
+
+const ItemContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  padding: theme.spacing(2),
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "2px",
+  margin: theme.spacing(1, 5),
+  width: "100%", // Full width inside StyledBox
+  borderBottom: "1px solid #ccc",
+  borderRadius: "8px",
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -70,23 +90,11 @@ const StyledButton = styled(Button)(({ theme }) => ({
   textTransform: "none",
 }));
 
-const ItemContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  padding: theme.spacing(2),
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: theme.spacing(5),
-  margin: theme.spacing(2, 10),
-  width: "45%",
-  borderBottom: "1px solid #ccc",
-  borderRadius: "8px",
-}));
-
 const ImageBox = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: "300px",
+  width: "200px",
   height: "100px",
   borderRadius: "8px",
   overflow: "hidden",
@@ -102,6 +110,11 @@ const StyledImage = styled("img")({
 
 const TitleTypography = styled(Typography)({
   width: "50%",
+});
+const ColumnContainer = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  width: "60%",
 });
 
 function Cart() {
@@ -160,89 +173,111 @@ function Cart() {
           </Typography>
         </Box>
       </HeroSection>
+      <Wrapper>
+        <ColumnContainer>
+          <StyledBox>
+            <Typography variant="h6" fontWeight="bold">
+              Product
+            </Typography>
+            <Typography variant="h6" fontWeight="bold">
+              Price
+            </Typography>
+            <Typography variant="h6" fontWeight="bold">
+              Quantity
+            </Typography>
+            <Typography variant="h6" fontWeight="bold">
+              Subtotal
+            </Typography>
+          </StyledBox>
 
-      <Box sx={{ display: "flex" }}>
-        <StyledBox>
-          <Typography variant="h6" fontWeight="bold">
-            Product
-          </Typography>
-          <Typography variant="h6" fontWeight="bold">
-            Price
-          </Typography>
-          <Typography variant="h6" fontWeight="bold">
-            Quantity
-          </Typography>
-        </StyledBox>
+          {cartItems.length === 0 ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                height: "50vh",
+                margin: theme.spacing(1, 15),
+                width: "100%",
+              }}
+            >
+              <img
+                src="./cart.jpeg"
+                alt="empty cart"
+                width="500px"
+                style={{ borderRadius: "8px" }}
+              />
+            </Box>
+          ) : (
+            cartItems.map((item) => (
+              <ItemContainer key={item.id}>
+                <ImageBox>
+                  <StyledImage src={item.thumbnail} alt={item.title} />
+                  <TitleTypography variant="body2">
+                    {item.title}
+                  </TitleTypography>
+                </ImageBox>
+                <Typography variant="body" sx={{ minWidth: "80px" }}>
+                  Rs: {item.discountPrice.toFixed(2)}
+                </Typography>
+                <TextField
+                  type="number"
+                  value={item.quantity}
+                  InputProps={{ inputProps: { min: 1 } }}
+                  onChange={(e) =>
+                    dispatch(
+                      updateQuantity({
+                        id: item.id,
+                        quantity: Number(e.target.value),
+                      })
+                    )
+                  }
+                  sx={{ width: "60px" }}
+                />
+                <Typography variant="body" sx={{ minWidth: "80px" }}>
+                  SubTotal: {item.discountPrice * item.quantity}
+                </Typography>
+                <Tooltip title="Delete">
+                  <IconButton onClick={() => handleRemoveItem(item.id)}>
+                    <Delete sx={{ color: "#e6d6bc" }} />
+                  </IconButton>
+                </Tooltip>
+              </ItemContainer>
+            ))
+          )}
+        </ColumnContainer>
 
         <StyledTotalBox>
           <Typography variant="h4" fontWeight="bold">
-            Total Bill
+            Cart Totals
           </Typography>
           <Typography variant="h6" align="center">
-            SubTotal: ${totalPrice.toFixed(2)}
+            Subtotal:
+            <Typography
+              variant="body1"
+              component="span"
+              fontWeight="bold"
+              sx={{ paddingLeft: "15px", color: "text.secondary" }}
+            >
+              {totalPrice.toFixed(2)}
+            </Typography>
+          </Typography>
+
+          <Typography variant="h6" align="center">
+            Total:
+            <Typography
+              variant="h6"
+              component="span"
+              fontWeight="bold"
+              sx={{ paddingLeft: "15px", color: "#ad8544" }}
+            >
+              {totalPrice.toFixed(2)}
+            </Typography>
           </Typography>
           <Link to="/checkout" style={{ textDecoration: "none" }}>
             <StyledButton variant="outlined">CheckOut now</StyledButton>
           </Link>
         </StyledTotalBox>
-      </Box>
-
-      {cartItems.length === 0 ? (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            height: "50vh",
-            margin: theme.spacing(1, 15),
-            width: "50%",
-          }}
-        >
-          <img
-            src="./cart.jpeg"
-            alt="empty cart"
-            width="500px"
-            style={{ borderRadius: "8px" }}
-          />
-        </Box>
-      ) : (
-        cartItems.map((item) => (
-          <ItemContainer key={item.id}>
-            <ImageBox>
-              <StyledImage src={item.thumbnail} alt={item.title} />
-              <TitleTypography variant="h6">{item.title}</TitleTypography>
-            </ImageBox>
-
-            {/* Price */}
-            <Typography variant="h6" sx={{ minWidth: "80px" }}>
-              Rs: {item.discountPrice.toFixed(2)}
-            </Typography>
-
-            {/* Quantity TextField */}
-            <TextField
-              type="number"
-              value={item.quantity}
-              InputProps={{ inputProps: { min: 1 } }}
-              onChange={(e) =>
-                dispatch(
-                  updateQuantity({
-                    id: item.id,
-                    quantity: Number(e.target.value),
-                  })
-                )
-              }
-              sx={{ width: "60px" }}
-            />
-
-            {/* Remove Button */}
-            <Tooltip title="Delete">
-              <IconButton onClick={() => handleRemoveItem(item.id)}>
-                <Delete sx={{ color: "#e6d6bc" }} />
-              </IconButton>
-            </Tooltip>
-          </ItemContainer>
-        ))
-      )}
-
+      </Wrapper>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

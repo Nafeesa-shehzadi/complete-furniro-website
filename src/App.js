@@ -7,8 +7,8 @@ import CheckOut from "./components/CheckOut";
 import Cart from "./components/Cart";
 import Navbar from "./components/Navbar";
 import ProductDetail from "./components/ProductDetail";
+import Blog from "./components/Blog";
 import Footer from "./components/Footer";
-import Gallery from "./components/Gallery";
 function App() {
   return (
     <Router>
@@ -21,7 +21,7 @@ function App() {
         <Route path="/checkout" element={<CheckOut />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/blog" element={<Blog />} />
       </Routes>
       <Footer />
     </Router>

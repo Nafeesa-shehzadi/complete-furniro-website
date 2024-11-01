@@ -30,9 +30,9 @@ const Section = styled(Box)(({ theme }) => ({
 }));
 
 const FooterTitle = styled(Typography)(({ theme }) => ({
-  fontSize: "20px",
-  fontWeight: "bold",
+  fontSize: "17px",
   marginBottom: theme.spacing(2),
+  color: theme.palette.text.secondary, // Use the theme's color for text
 }));
 
 const FooterLink = styled(Link)(({ theme }) => ({
@@ -58,7 +58,6 @@ const FooterButton = styled(Button)(({ theme }) => ({
   paddingRight: "5rem",
   marginLeft: "1px",
   textDecoration: "underline",
-  textTransform: "none",
   "&:hover": {
     textDecoration: "underline",
   },
@@ -70,8 +69,16 @@ function Footer() {
       <FooterContainer>
         {/* Furniro Section */}
         <Section>
-          <FooterTitle>Furniro.</FooterTitle>
-          <Typography variant="body2">
+          <Typography variant="h6" fontWeight="bold" gutterBottom>
+            Furniro.
+          </Typography>
+
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+            }}
+          >
             400 University Drive Suite 200 Coral Gables,
             <br /> FL 33134 USA
           </Typography>
@@ -112,7 +119,11 @@ function Footer() {
         </Section>
         {/* Divider */}
         <Divider sx={{ width: "100%", my: 2 }} />
-        <Typography variant="body2" align="center">
+        <Typography
+          variant="body2"
+          align="center"
+          sx={{ color: "text.secondary", mt: 2 }}
+        >
           © 2024 Furniro. All rights reserved.
         </Typography>
       </FooterContainer>

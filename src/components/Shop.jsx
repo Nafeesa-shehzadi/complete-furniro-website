@@ -28,6 +28,7 @@ import {
   Select,
   InputLabel,
   Snackbar,
+  Badge,
 } from "@mui/material";
 
 const itemsPerPage = 8; // Fixed number of items per page
@@ -51,16 +52,32 @@ const SearchSection = styled(Box)(({ theme }) => ({
   backgroundColor: "#f2edda",
   flexDirection: "row",
   gap: theme.spacing(3),
-  padding: theme.spacing(0, 20),
+  padding: theme.spacing(0, 20), // Default padding for larger screens
   height: "15vh",
+
+  [theme.breakpoints.down("lg")]: {
+    padding: theme.spacing(0, 15), // Adjust padding for large screens
+  },
+  [theme.breakpoints.down("md")]: {
+    padding: theme.spacing(0, 10), // Adjust padding for medium screens
+  },
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(0, 5), // Adjust padding for small screens
+  },
 }));
+
+const StyledImage = styled("img")({
+  width: "100%",
+  maxWidth: "250px",
+  height: "200px",
+  display: "block",
+});
+
 const StyledCard = styled("div")({
   position: "relative",
-  overflow: "hidden",
   "&:hover .add-to-cart-btn, &:hover .icon-row, &:hover .overlay": {
     opacity: 1, // Show on hover
   },
-  borderRadius: "10px",
   width: "250px",
 });
 
@@ -69,20 +86,13 @@ const StyledImageContainer = styled("div")({
   overflow: "hidden",
 });
 
-const StyledImage = styled("img")({
-  width: "100%",
-  maxWidth: "250px",
-  height: "300px",
-  display: "block",
-});
-
 const Overlay = styled("div")({
   position: "absolute",
   top: 0,
   left: 0,
   width: "100%",
   height: "100%",
-  backgroundColor: "rgba(0, 0, 0, 0.5)", // Black overlay with slight transparency
+  backgroundColor: "rgba(0, 0, 0, 0.6)", // Black overlay with slight transparency
   backdropFilter: "blur(5px)", // Apply blur effect
   opacity: 0, // Hidden initially
   transition: "opacity 0.3s ease-in-out",
@@ -90,22 +100,21 @@ const Overlay = styled("div")({
 
 const AddToCartButton = styled(Button)(({ theme }) => ({
   position: "absolute",
-  bottom: "140px",
+  bottom: "200px",
   left: "50%",
+  right: "1%",
   transform: "translateX(-50%)",
   opacity: 0, // Hidden initially
   transition: "opacity 0.3s ease-in-out",
   backgroundColor: theme.palette.common.white,
   color: theme.palette.warning.main, // Yellow text
-  "&:hover": {
-    color: theme.palette.warning.main, // Keep yellow text on hover
-  },
 }));
 
 const IconRow = styled(Box)({
   position: "absolute",
-  bottom: "100px",
+  bottom: "150px",
   left: "50%",
+  right: "10%",
   transform: "translateX(-50%)",
   opacity: 0, // Hidden initially
   transition: "opacity 0.3s ease-in-out",
@@ -145,15 +154,12 @@ const NextButtons = styled(Button)(({ theme, active }) => ({
 }));
 const StyledButton = styled(Button)(({ theme }) => ({
   position: "absolute",
-  bottom: "50px",
-  left: "50%",
+  bottom: "110px",
+  left: "45%",
   transform: "translateX(-50%)",
   opacity: 0, // Hidden initially
   transition: "opacity 0.3s ease-in-out",
   borderColor: theme.palette.common.white,
-  "&:hover": {
-    backgroundColor: "#ad8544",
-  },
   color: theme.palette.common.white,
 }));
 const ServiceBox = styled(Box)(({ theme }) => ({
@@ -190,6 +196,26 @@ const ServiceDescription = styled(Typography)(({ theme }) => ({
   variant: "body2",
   color: theme.palette.text.secondary,
 }));
+const TitleContainer = styled("div")(({ expanded }) => ({
+  display: "-webkit-box",
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  WebkitLineClamp: expanded ? "none" : 1, // Show full title if expanded, otherwise limit to 2 lines
+  cursor: "pointer", // Pointer cursor for title
+  transition: "font-size 0.2s", // Transition for font size
+}));
+const StyledBadge = styled(Badge)(({ theme, isNew }) => ({
+  position: "absolute",
+  top: "10px",
+  right: "12px",
+  padding: "15px 10px",
+  color: "white",
+  backgroundColor: isNew ? "#30c4ac" : "#ec8484", // Green for new, red for discount
+  borderRadius: "50%",
+  fontWeight: "bold",
+  fontSize: "0.8rem",
+}));
 function Shop() {
   const theme = createTheme();
   const dispatch = useDispatch();
@@ -199,6 +225,7 @@ function Shop() {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalDisplayCount, setTotalDisplayCount] = useState(8); // Total items to display
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const products = useSelector(selectDisplayedProducts);
   const cartItems = useSelector(selectCartItems);
   const status = useSelector((state) => state.products.status);
@@ -252,8 +279,14 @@ function Shop() {
 
   const handleAddToCart = (product) => {
     const isInCart = cartItems.some((item) => item.id === product.id);
-    if (!isInCart) dispatch(addItemToCart({ ...product, quantity: 1 }));
-    setSnackbarOpen(true);
+    if (!isInCart) {
+      dispatch(addItemToCart({ ...product, quantity: 1 }));
+      setSnackbarOpen(true);
+      setSnackbarMessage(`${product.title} added in Cart`);
+    } else {
+      setSnackbarOpen(true);
+      setSnackbarMessage("Product already in cart");
+    }
   };
 
   const handleSnackbarClose = () => setSnackbarOpen(false);
@@ -271,6 +304,19 @@ function Shop() {
   const handleGridChange = (size) => {
     setItemsPerRow(size);
   };
+  const [expandedProductId, setExpandedProductId] = useState(null); // State for expanded card
+
+  // ... existing useEffect and functions remain the same
+
+  const handleTitleClick = (id) => {
+    if (expandedProductId === id) {
+      setExpandedProductId(null); // Collapse if already expanded
+    } else {
+      setExpandedProductId(id); // Expand to show full title
+    }
+  };
+  const totalButtons = Math.ceil(products.length / itemsPerPage); // Total buttons based on products
+
   return (
     <ThemeProvider theme={theme}>
       <HeroSection>
@@ -364,10 +410,20 @@ function Shop() {
       <ProductItems>
         <Grid container spacing={2}>
           {displayedProducts.map((product) => (
-            <Grid item xs={itemsPerRow} key={product.id}>
+            <Grid
+              item
+              xs={12} // 1 item per row on extra-small screens
+              sm={itemsPerRow === 12 ? 12 : 6} // 2 items per row for '12' layout; 4 otherwise on small screens
+              md={itemsPerRow === 3 ? 3 : itemsPerRow === 6 ? 6 : 12} // 4, 2, or 1 items per row on medium
+              lg={itemsPerRow} // Full control over the grid size for large screens
+              key={product.id}
+            >
               {" "}
               <StyledCard>
                 <StyledImageContainer>
+                  <StyledBadge isNew={product.isNew}>
+                    {product.isNew ? "New" : "-10%"}
+                  </StyledBadge>
                   <StyledImage src={product.thumbnail} alt={product.title} />
                   <Overlay className="overlay" />{" "}
                   {/* Black overlay with blur effect */}
@@ -378,12 +434,9 @@ function Shop() {
                     Add to Cart
                   </AddToCartButton>
                   <IconRow className="icon-row">
-                    <IconButton>
+                    <IconButton sx={{ m: "2px" }}>
                       <ShareIcon style={{ color: "white" }} />
-                      <Typography
-                        variant="body2"
-                        style={{ color: "white", marginLeft: "8px" }}
-                      >
+                      <Typography variant="body2" style={{ color: "white" }}>
                         {" "}
                         Share
                       </Typography>
@@ -391,22 +444,22 @@ function Shop() {
 
                     <IconButton>
                       <CompareArrowsIcon style={{ color: "white" }} />
-                      <Typography
-                        variant="body2"
-                        style={{ color: "white", marginLeft: "8px" }}
-                      >
+                      <Typography variant="body2" style={{ color: "white" }}>
                         {" "}
                         Compare
                       </Typography>
                     </IconButton>
 
-                    <IconButton onClick={() => handleLikeToggle(product.id)}>
+                    <IconButton
+                      sx={{ mr: "2px" }}
+                      onClick={() => handleLikeToggle(product.id)}
+                    >
                       {likedItems[product.id] ? (
                         <>
                           <FavoriteIcon style={{ color: "red" }} />
                           <Typography
                             variant="body2"
-                            style={{ color: "white", marginLeft: "8px" }}
+                            style={{ color: "white" }}
                           >
                             {" "}
                             Liked
@@ -417,7 +470,7 @@ function Shop() {
                           <FavoriteBorderIcon style={{ color: "white" }} />
                           <Typography
                             variant="body2"
-                            style={{ color: "white", marginLeft: "8px" }}
+                            style={{ color: "white" }}
                           >
                             {" "}
                             Like
@@ -432,19 +485,46 @@ function Shop() {
                   >
                     Explore More
                   </StyledButton>
-                </StyledImageContainer>
-                <CardContent sx={{ backgroundColor: "#f2edda" }}>
-                  <Typography variant="h6" fontWeight="bold">
-                    {product.title}
-                  </Typography>
+                  <CardContent sx={{ backgroundColor: "#edf0f2" }}>
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      onClick={() => handleTitleClick(product.id)} // Click handler to expand/collapse
+                      style={{
+                        cursor: "pointer",
+                        transition: "font-size 0.2s",
+                      }} // Pointer cursor for title
+                    >
+                      <TitleContainer
+                        expanded={expandedProductId === product.id}
+                      >
+                        {product.title}
+                      </TitleContainer>
+                    </Typography>
 
-                  <Typography variant="h6">
-                    Rs: {product.discountPrice}
-                    <span sx={{ ml: "100px" }}>
-                      Rs:<del>{product.price}</del>
-                    </span>
-                  </Typography>
-                </CardContent>
+                    <Typography
+                      variant="body2"
+                      fontWeight="bold"
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Box component="span">
+                        Rs: {product.discountPrice}{" "}
+                        {/* Discount price at the start */}
+                      </Box>
+                      <Box
+                        component="span"
+                        sx={{
+                          ml: 2,
+                          color: "text.secondary",
+                          fontWeight: "normal",
+                        }} // Left margin and secondary color for original price
+                      >
+                        <del> Rs:{product.price}</del>{" "}
+                        {/* Original price with strikethrough at the end */}
+                      </Box>
+                    </Typography>
+                  </CardContent>
+                </StyledImageContainer>
               </StyledCard>
             </Grid>
           ))}
@@ -452,11 +532,12 @@ function Shop() {
 
         {/* Pagination Buttons */}
         <ButtonContainer>
-          {Array.from({ length: totalPages }, (_, index) => (
+          {Array.from({ length: totalButtons }, (_, index) => (
             <NextButtons
               key={index}
               onClick={() => handlePageChange(index)}
-              active={index === currentPage}
+              active={index === currentPage && index < totalPages} // Only active within totalPages
+              disabled={index >= totalPages} // Disable buttons beyond totalPages
             >
               {index + 1}
             </NextButtons>
@@ -492,7 +573,8 @@ function Shop() {
         open={snackbarOpen}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
-        message="Item added to cart!"
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       />
     </ThemeProvider>
   );

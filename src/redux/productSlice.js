@@ -33,7 +33,7 @@ export const fetchProducts = createAsyncThunk(
       const price = generateRandomPrice();
       const discountPrice = parseFloat((price * 0.9).toFixed(2)); // Calculate a 10% discount price
       // Determine if the product is new based on updated_at date (within the last 6 months)
-      const isNew = isDateWithinDays(item.updated_at, 1); // Change 6 to 10 for 10 months
+      const isNew = isDateWithinDays(item.updated_at, 2); // Change 6 to 10 for 10 months
       return {
         id: item.id,
         title: item.alt_description || "No description available",
