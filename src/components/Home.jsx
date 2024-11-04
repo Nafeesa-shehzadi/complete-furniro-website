@@ -50,7 +50,7 @@ const HeroSection = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3), // Add padding for spacing inside the box
   backgroundColor: "rgb(249, 241, 231)",
   color: theme.palette.common.black,
-  width: "35%", // Set the width of the HeroSection
+  width: "30%", // Set the width of the HeroSection
   maxWidth: "500px", // Ensure it doesn't exceed 500px
   height: "auto", // Automatically adjust height based on content
   marginRight: theme.spacing(6), // Space from the right side
@@ -101,7 +101,6 @@ const StyledCard = styled("div")({
   overflow: "hidden",
   borderRadius: "10px",
   width: "200px",
-  cursor: "pointer",
   "&:hover .hover-content": {
     opacity: 1, // Show overlay on hover for full card
   },
@@ -160,9 +159,10 @@ const StyledImage = styled("img")({
 
 const CardContentBox = styled(Box)({
   padding: "16px",
-  "&:hover .hover-content": {
+  "&:hover .hover-content ": {
     opacity: 1, // Ensure hover works on CardContent as well
   },
+  backgroundColor: "#edf0f2",
 });
 
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -317,7 +317,31 @@ const StyledBadge = styled(Badge)(({ theme, isNew }) => ({
   fontWeight: "bold",
   fontSize: "0.8rem",
 }));
-
+const TitleContainer = styled("div")(({ expanded }) => ({
+  display: "-webkit-box",
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  WebkitLineClamp: expanded ? "none" : 1, // Show full title if expanded, otherwise limit to 2 lines
+  cursor: "pointer", // Pointer cursor for title
+  transition: "font-size 0.2s", // Transition for font size
+}));
+const TruncatedDescription = styled(Typography)({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap", // Ensures it stays on one line
+  maxWidth: "200px", // Adjust this to fit the width of your container
+});
+const StyledExploreBtn = styled(Button)(({ theme }) => ({
+  position: "absolute",
+  bottom: "60px",
+  left: "45%",
+  transform: "translateX(-50%)",
+  opacity: 0, // Hidden initially
+  transition: "opacity 0.3s ease-in-out",
+  borderColor: theme.palette.common.white,
+  color: theme.palette.common.white,
+}));
 const Home = () => {
   const dispatch = useDispatch();
   const products = useSelector(selectDisplayedProducts);
@@ -330,7 +354,17 @@ const Home = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const cartItems = useSelector(selectCartItems); // Access cart items using the selector
   const navigate = useNavigate();
+  const [expandedProductId, setExpandedProductId] = useState(null); // State for expanded card
 
+  // ... existing useEffect and functions remain the same
+
+  const handleTitleClick = (id) => {
+    if (expandedProductId === id) {
+      setExpandedProductId(null); // Collapse if already expanded
+    } else {
+      setExpandedProductId(id); // Expand to show full title
+    }
+  };
   useEffect(() => {
     if (status === "idle") {
       dispatch(fetchProducts());
@@ -412,7 +446,7 @@ const Home = () => {
     navigate("/shop");
   };
 
-  const handleCardClick = (productId) => {
+  const handleExploreClick = (productId) => {
     navigate(`/product/${productId}`);
   };
 
@@ -428,6 +462,7 @@ const Home = () => {
             gutterBottom
             color="#a37821"
             fontWeight="bold"
+            fontFamily="poppins"
           >
             Discover Our New Collection
           </Typography>
@@ -490,8 +525,7 @@ const Home = () => {
               return (
                 <Grid item xs={12} sm={6} md={2.4} key={product.id}>
                   {" "}
-                  {/* Changed to md={2.4} for 5 items in one row */}
-                  <StyledCard onClick={() => handleCardClick(product.id)}>
+                  <StyledCard>
                     <StyledImageContainer>
                       <StyledBadge isNew={product.isNew}>
                         {product.isNew ? "New" : "-10%"}
@@ -529,7 +563,10 @@ const Home = () => {
                             </Typography>
                           </SmallIconButton>
                           <SmallIconButton
-                            onClick={() => handleLikeToggle(product.id)}
+                            onClick={(e) => {
+                              e.stopPropagation(); // Prevent card click from triggering
+                              handleLikeToggle(product.id);
+                            }}
                           >
                             {likedItems[product.id] ? (
                               <FavoriteIcon style={{ color: "red" }} />
@@ -544,25 +581,60 @@ const Home = () => {
                             </Typography>
                           </SmallIconButton>
                         </IconRow>
+                        <StyledExploreBtn
+                          onClick={() => {
+                            handleExploreClick(product.id);
+                          }}
+                        >
+                          explore more
+                        </StyledExploreBtn>
                       </HoverContentBox>
                     </StyledImageContainer>
                     <CardContentBox>
-                      <Typography variant="h6" fontWeight="bold">
-                        {product.title}
+                      <Typography
+                        variant="h6"
+                        fontWeight="bold"
+                        onClick={() => handleTitleClick(product.id)} // Click handler to expand/collapse
+                        style={{
+                          cursor: "pointer",
+                          transition: "font-size 0.2s",
+                        }} // Pointer cursor for title
+                      >
+                        <TitleContainer
+                          expanded={expandedProductId === product.id}
+                        >
+                          {product.title}
+                        </TitleContainer>
                       </Typography>
-                      <Typography variant="body2" fontWeight="bold">
-                        {product.isNew ? (
-                          `Rs: ${product.price}` // Show only the price if the product is new
-                        ) : (
-                          <>
-                            Rs: {product.discountPrice}{" "}
-                            <span>
-                              <del style={{ color: "rgba(0, 0, 0, 0.5)" }}>
-                                Rs: {product.price}
-                              </del>
-                            </span>
-                          </>
-                        )}
+                      <TruncatedDescription
+                        variant="body2"
+                        color="text.secondary"
+                      >
+                        {product.description}
+                      </TruncatedDescription>
+                      <Typography
+                        variant="body2"
+                        fontWeight="bold"
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Box component="span">
+                          Rs: {product.discountPrice}{" "}
+                          {/* Discount price at the start */}
+                        </Box>
+                        <Box
+                          component="span"
+                          sx={{
+                            ml: 2,
+                            color: "text.secondary",
+                            fontWeight: "normal",
+                          }} // Left margin and secondary color for original price
+                        >
+                          <del> Rs:{product.price}</del>{" "}
+                          {/* Original price with strikethrough at the end */}
+                        </Box>
                       </Typography>
                     </CardContentBox>
                   </StyledCard>

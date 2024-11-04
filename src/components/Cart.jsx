@@ -32,54 +32,71 @@ const HeroSection = styled(Box)(({ theme }) => ({
   justifyContent: "center",
   color: theme.palette.common.black,
   textAlign: "center",
+  [theme.breakpoints.down("sm")]: {
+    height: "50vh", // Adjust height for smaller screens
+  },
 }));
 
-// Parent Wrapper that organizes StyledBox and StyledTotalBox in a row
-const Wrapper = styled(Box)({
+const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
-  width: "100%", // Full width for layout flexibility
-  gap: "140px", // Adjust spacing between StyledBox and StyledTotalBox
-});
+  width: "100%",
+  gap: "40px",
+  [theme.breakpoints.down("md")]: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+}));
 
 const StyledBox = styled(Box)(({ theme }) => ({
   display: "flex",
-  justifyContent: "center",
-  gap: theme.spacing(10),
-  padding: theme.spacing(5),
-  margin: theme.spacing(1, 5),
+  justifyContent: "space-between",
+  gap: theme.spacing(15),
+  padding: theme.spacing(3, 5),
+  paddingRight: theme.spacing(15),
   backgroundColor: "#e6d6bc",
-  width: "90%", // 60% of the parent's width
-  height: "auto", // Adjust height for content as needed
+  margin: theme.spacing(0, 5),
+  width: "70%",
+  height: "auto",
+
+  [theme.breakpoints.down("md")]: {
+    width: "100%", // Full width on medium and smaller screens
+    alignItems: "center",
+  },
 }));
 
 const StyledTotalBox = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  gap: theme.spacing(5),
-  padding: theme.spacing(5),
-  margin: theme.spacing(1, 5),
+  gap: theme.spacing(3),
+  padding: theme.spacing(3),
   backgroundColor: "#e6d6bc",
-  width: "20%", // 20% of the parent's width
-  height: "10%",
+  width: "30%",
+  height: "20%",
   flexDirection: "column",
+  [theme.breakpoints.down("md")]: {
+    width: "100%", // Full width on medium and smaller screens
+    marginTop: theme.spacing(3),
+  },
 }));
 
 const ItemContainer = styled(Box)(({ theme }) => ({
   display: "flex",
-  padding: theme.spacing(2),
   justifyContent: "space-between",
   alignItems: "center",
-  gap: "2px",
-  margin: theme.spacing(1, 5),
-  width: "100%", // Full width inside StyledBox
+  margin: theme.spacing(2, 5),
+  width: "88%",
   borderBottom: "1px solid #ccc",
   borderRadius: "8px",
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  marginLeft: "30px",
+  marginLeft: theme.spacing(2),
   borderRadius: "5px",
   borderColor: "#ad8544",
   color: "#ad8544",
@@ -94,28 +111,37 @@ const ImageBox = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: "200px",
+  width: "180px",
   height: "100px",
   borderRadius: "8px",
   overflow: "hidden",
   position: "relative",
   textAlign: "center",
+  [theme.breakpoints.down("sm")]: {
+    width: "100px",
+    height: "60px",
+    flexDirection: "column",
+  },
 }));
 
 const StyledImage = styled("img")({
-  width: "50%", // Use full width of the box
-  height: "100%", // Use full height of the box
-  objectFit: "cover", // Cover to maintain aspect ratio
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
 });
 
 const TitleTypography = styled(Typography)({
   width: "50%",
 });
-const ColumnContainer = styled(Box)({
+
+const ColumnContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  width: "60%",
-});
+  width: "100%",
+  [theme.breakpoints.down("sm")]: {
+    alignItems: "center",
+  },
+}));
 
 function Cart() {
   const cartItems = useSelector(selectCartItems);
@@ -196,7 +222,7 @@ function Cart() {
                 display: "flex",
                 justifyContent: "center",
                 height: "50vh",
-                margin: theme.spacing(1, 15),
+                margin: theme.spacing(1, 3),
                 width: "100%",
               }}
             >
@@ -238,7 +264,7 @@ function Cart() {
                 </Typography>
                 <Tooltip title="Delete">
                   <IconButton onClick={() => handleRemoveItem(item.id)}>
-                    <Delete sx={{ color: "#e6d6bc" }} />
+                    <Delete sx={{ color: "#e6d6bc", paddingLeft: "0px" }} />
                   </IconButton>
                 </Tooltip>
               </ItemContainer>
@@ -286,9 +312,8 @@ function Cart() {
       >
         <Alert
           onClose={handleSnackbarClose}
-          severity="success"
-          variant="filled"
-          sx={{ width: "300px" }}
+          severity="info"
+          sx={{ width: "100%" }}
         >
           {snackbarMessage}
         </Alert>

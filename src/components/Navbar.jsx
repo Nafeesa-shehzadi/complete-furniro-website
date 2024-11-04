@@ -26,8 +26,7 @@ import {
   removeItemFromCart,
   clearCart,
 } from "../redux/cartSlice";
-import { Delete } from "@mui/icons-material";
-
+import ShoppingBasketOutlinedIcon from "@mui/icons-material/ShoppingBasketOutlined";
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
@@ -86,8 +85,12 @@ const StyledButton = styled(Button)(({ theme }) => ({
 }));
 
 const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
+  display: "flex", // Use flexbox for layout
+  justifyContent: "center", // Center the items horizontally
+  alignItems: "center", // Center the items vertically
+  padding: "15px", // Add padding
   "&:hover": {
-    backgroundColor: "transparent",
+    backgroundColor: "transparent", // Keep the background transparent on hover
   },
 }));
 
@@ -106,6 +109,7 @@ export default function Navbar() {
 
   const handleCartClick = (event) => {
     setAnchorEl(event.currentTarget);
+    setMobileMenuOpen(false); // Close the mobile menu when the cart icon is clicked
   };
 
   const handleCartClose = () => {
@@ -221,6 +225,14 @@ export default function Navbar() {
                 Contact
               </Link>
             </MenuItem>
+
+            <MenuItem>
+              <IconButton color="inherit" onClick={handleCartClick}>
+                <Badge badgeContent={cartItems.length} color="error">
+                  <ShoppingCartOutlinedIcon />
+                </Badge>
+              </IconButton>
+            </MenuItem>
           </Box>
         )}
 
@@ -230,30 +242,43 @@ export default function Navbar() {
           open={Boolean(anchorEl)}
           onClose={handleCartClose}
         >
-          <Typography
-            variant="h6"
-            fontWeight="bold"
-            align="center"
-            sx={{ m: 1 }}
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ padding: 1 }} // Adjust padding as needed
           >
-            Shopping Cart
-          </Typography>
+            <Typography variant="h6" fontWeight="bold" sx={{ m: 1 }}>
+              Shopping Cart
+            </Typography>
+            <ShoppingBasketOutlinedIcon />
+          </Box>
           {cartItems.length === 0 ? (
             <MenuItem>
               <ListItemText primary="Cart is empty" />
             </MenuItem>
           ) : (
             cartItems.map((item) => (
-              <CustomMenuItem key={item.id}>
-                <ListItemText primary={item.title} />
-                <Typography>${item.discountPrice}</Typography>
+              <CustomMenuItem
+                key={item.id}
+                disableRipple
+                justifyContent="center"
+              >
+                <ListItemText
+                  sx={{
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis",
+                  }}
+                  primary={item.title}
+                />
+                <Typography marginLeft="6px">{item.discountPrice}</Typography>
                 <IconButton
                   edge="end"
                   color="inherit"
                   onClick={() => handleRemoveItem(item.id)}
                   style={{ marginLeft: "30px" }}
                 >
-                  <Delete fontSize="small" />
+                  <CloseIcon fontSize="small" />
                 </IconButton>
               </CustomMenuItem>
             ))
@@ -268,7 +293,7 @@ export default function Navbar() {
             </CustomMenuItem>
           )}
           {cartItems.length > 0 && (
-            <CustomMenuItem disableRipple>
+            <CustomMenuItem disableRipple justifyContent="center">
               <Link
                 to="/cart"
                 style={{ textDecoration: "none" }}
@@ -281,7 +306,12 @@ export default function Navbar() {
                 style={{ textDecoration: "none" }}
                 onClick={handleCartClose}
               >
-                <StyledButton variant="outlined">Checkout now</StyledButton>
+                <StyledButton
+                  variant="outlined"
+                  style={{ marginLeft: "8px" }} // Optional: Add some space between buttons
+                >
+                  Checkout now
+                </StyledButton>
               </Link>
               <StyledButton
                 variant="outlined"

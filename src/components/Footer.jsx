@@ -42,6 +42,11 @@ const FooterLink = styled(Link)(({ theme }) => ({
   "&:hover": {
     textDecoration: "underline",
   },
+  fontFamily: "poppins",
+  fontSize: "16px",
+  lineHeight: "24px",
+  textAlign: "left",
+  fontWeight: "bold",
 }));
 
 const NewsletterInput = styled(TextField)(({ theme }) => ({
@@ -61,6 +66,11 @@ const FooterButton = styled(Button)(({ theme }) => ({
   "&:hover": {
     textDecoration: "underline",
   },
+  fontFamily: "poppins",
+  fontSize: "16px",
+  lineHeight: "24px",
+  textAlign: "left",
+  fontWeight: "bold",
 }));
 
 function Footer() {
@@ -69,8 +79,13 @@ function Footer() {
       <FooterContainer>
         {/* Furniro Section */}
         <Section>
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
-            Furniro.
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            fontFamily="poppins"
+            gutterBottom
+          >
+            Funiro.
           </Typography>
 
           <Typography

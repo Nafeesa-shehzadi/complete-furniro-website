@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import { fetchProducts, selectDisplayedProducts } from "../redux/productSlice"; // Adjust the import path as necessary
-import { addItemToCart, selectCartItems } from "../redux/cartSlice";
+import {
+  addItemToCart,
+  selectCartItems,
+  removeItemFromCart,
+} from "../redux/cartSlice";
 import { useNavigate, Link } from "react-router-dom";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import ShareIcon from "@mui/icons-material/Share";
@@ -109,12 +113,13 @@ const AddToCartButton = styled(Button)(({ theme }) => ({
   position: "absolute",
   bottom: "200px",
   left: "50%",
-  right: "1%",
+  right: "0%",
   transform: "translateX(-50%)",
   opacity: 0, // Hidden initially
   transition: "opacity 0.3s ease-in-out",
   backgroundColor: theme.palette.common.white,
   color: theme.palette.warning.main, // Yellow text
+  textTransform: "none",
 }));
 
 const IconRow = styled(Box)({
@@ -223,6 +228,12 @@ const StyledBadge = styled(Badge)(({ theme, isNew }) => ({
   fontWeight: "bold",
   fontSize: "0.8rem",
 }));
+const TruncatedDescription = styled(Typography)({
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap", // Ensures it stays on one line
+  maxWidth: "200px", // Adjust this to fit the width of your container
+});
 function Shop() {
   const theme = createTheme();
   const dispatch = useDispatch();
@@ -284,18 +295,6 @@ function Shop() {
     if (newPage >= 0 && newPage < totalPages) setCurrentPage(newPage);
   };
 
-  const handleAddToCart = (product) => {
-    const isInCart = cartItems.some((item) => item.id === product.id);
-    if (!isInCart) {
-      dispatch(addItemToCart({ ...product, quantity: 1 }));
-      setSnackbarOpen(true);
-      setSnackbarMessage(`${product.title} added in Cart`);
-    } else {
-      setSnackbarOpen(true);
-      setSnackbarMessage("Product already in cart");
-    }
-  };
-
   const handleSnackbarClose = () => setSnackbarOpen(false);
   // Function to handle like toggle
   const handleLikeToggle = (productId) => {
@@ -323,7 +322,32 @@ function Shop() {
     }
   };
   const totalButtons = Math.ceil(products.length / itemsPerPage); // Total buttons based on products
+  const isProductInCart = (productId) => {
+    return cartItems.some((item) => item.id === productId);
+  };
 
+  // Handle cart actions
+  const handleCart = (product) => {
+    if (isProductInCart(product.id)) {
+      dispatch(removeItemFromCart(product.id));
+      setSnackbarMessage(`Removed ${product.title} from the cart!`);
+    } else {
+      dispatch(addItemToCart({ ...product, quantity: 1 }));
+      setSnackbarMessage(`Added ${product.title} to the cart!`);
+    }
+    setSnackbarOpen(true); // Open snackbar after action
+  };
+  const handleAddToCart = (product) => {
+    const isInCart = cartItems.some((item) => item.id === product.id);
+    if (!isInCart) {
+      dispatch(addItemToCart({ ...product, quantity: 1 }));
+      setSnackbarOpen(true);
+      setSnackbarMessage(`${product.title} added in Cart`);
+    } else {
+      setSnackbarOpen(true);
+      setSnackbarMessage("Product already in cart");
+    }
+  };
   return (
     <ThemeProvider theme={theme}>
       <HeroSection>
@@ -442,9 +466,12 @@ function Shop() {
                   {/* Black overlay with blur effect */}
                   <AddToCartButton
                     className="add-to-cart-btn"
-                    onClick={() => handleAddToCart(product)}
+                    onClick={() => handleCart(product)}
+                    variant="outlined"
                   >
-                    Add to Cart
+                    {isProductInCart(product.id)
+                      ? "Remove from Cart"
+                      : "Add to Cart"}
                   </AddToCartButton>
                   <IconRow className="icon-row">
                     <IconButton sx={{ m: "2px" }}>
@@ -514,7 +541,12 @@ function Shop() {
                         {product.title}
                       </TitleContainer>
                     </Typography>
-
+                    <TruncatedDescription
+                      variant="body2"
+                      color="text.secondary"
+                    >
+                      {product.description}
+                    </TruncatedDescription>
                     <Typography
                       variant="body2"
                       fontWeight="bold"

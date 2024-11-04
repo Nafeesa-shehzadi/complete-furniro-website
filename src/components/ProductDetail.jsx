@@ -28,9 +28,10 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import Masonry from "@mui/lab/Masonry";
 // Styled components
 const StyledContainer = styled(Box)(({ theme }) => ({
-  margin: theme.spacing(5, 7),
+  maxWidth: "100%",
   padding: theme.spacing(5),
 }));
+
 const HeroSection = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "flex-start",
@@ -38,18 +39,37 @@ const HeroSection = styled(Box)(({ theme }) => ({
   backgroundColor: "#f2edda",
   flexDirection: "row",
   height: "15vh",
-  maxWidth: "100%",
-  overflow: "hidden",
-  padding: theme.spacing(0, 10), // Reduced padding
-  gap: theme.spacing(2),
+  width: "100%",
+  padding: theme.spacing(2, 0),
+  paddingLeft: theme.spacing(3), // Add padding on the left
+  gap: theme.spacing(1),
+  boxSizing: "border-box", // Ensure padding does not create overflow
 }));
 
-const StyledImage = styled("img")({
-  height: "350px",
-  objectFit: "cover", // Keep the aspect ratio
-  width: "350px",
+const StyledImage = styled("img")(({ theme }) => ({
+  width: "100%",
+  maxHeight: "350px",
+  objectFit: "cover",
   borderRadius: "10px",
-});
+  [theme.breakpoints.up("sm")]: {
+    width: "70%",
+  },
+  [theme.breakpoints.up("md")]: {
+    width: "350px",
+    height: "350px",
+  },
+}));
+
+const ButtonContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: theme.spacing(1),
+  [theme.breakpoints.up("sm")]: {
+    flexDirection: "row",
+  },
+}));
+
 const StyledButton = styled(Button)(({ theme }) => ({
   borderRadius: "5px",
   width: "100%",
@@ -57,17 +77,8 @@ const StyledButton = styled(Button)(({ theme }) => ({
   marginLeft: "1px",
   borderColor: "black",
   marginTop: 10,
-
   color: "black",
   textTransform: "none",
-}));
-const ButtonContainer = styled(Box)(({ theme }) => ({
-  display: "flex",
-  flexDirection: "row",
-  justifyContent: "flex-start",
-  alignItems: "center",
-  marginBottom: theme.spacing(2),
-  gap: theme.spacing(2),
 }));
 
 const NextButtons = styled(Button)(({ theme, active }) => ({
@@ -419,15 +430,27 @@ const ProductDetail = () => {
             ))}
           </Box>
         )}
+        <Grid container spacing={2} justifyContent="center">
+          {/* First Item */}
+          <Grid item xs={12} sm={6} md={3} lg={2}>
+            <img
+              src="/sofa.png"
+              alt="sofas"
+              style={{ width: "100%", height: "auto" }} // Set a fixed width
+            />
+          </Grid>
 
-        <Grid item xs={6} sm={4} md={3} lg={2}>
-          <img
-            src="/sofa.png"
-            alt="sofas"
-            style={{ width: "500px", height: "auto" }} // Set a fixed width
-          />
+          {/* Second Item */}
+          <Grid item xs={12} sm={6} md={3} lg={2}>
+            <img
+              src="/sofa.png"
+              alt="sofas"
+              style={{ width: "100%", height: "auto" }} // Set a fixed width
+            />
+          </Grid>
         </Grid>
       </Box>
+
       <Divider
         flexItem
         sx={{ height: "30px", mx: 5 }} // Set a height if needed
