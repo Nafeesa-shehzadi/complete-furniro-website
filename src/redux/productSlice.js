@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // Helper function to generate a random price
-const generateRandomPrice = (min = 500, max = 5000) => {
-  return parseFloat((Math.random() * (max - min) + min).toFixed(2)); // Generates a price between $50 and $500
+const generateRandomPrice = (min = 1000, max = 5000) => {
+  return parseFloat((Math.random() * (max - min) + min).toFixed(1)); // Generates a price between $50 and $500
 };
 // Helper function to check if a date is within the last n months
 const isDateWithinDays = (dateString, days) => {

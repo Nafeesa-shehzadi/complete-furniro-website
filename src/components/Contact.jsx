@@ -312,37 +312,45 @@ function Contact() {
         <ServiceBox>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={3}>
-              <ServiceImage src="quality.png" alt="Quality" />
-              <ServiceTextContainer>
-                <ServiceTitle>High Quality</ServiceTitle>
-                <ServiceDescription>
-                  crafted from top materials
-                </ServiceDescription>
-              </ServiceTextContainer>
+              <Grid container alignItems="center">
+                <ServiceImage src="quality.png" alt="Quality" />
+                <ServiceTextContainer>
+                  <ServiceTitle>High Quality</ServiceTitle>
+                  <ServiceDescription>
+                    crafted from top materials
+                  </ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
             </Grid>
 
             <Grid item xs={12} sm={6} md={3}>
-              <ServiceImage src="wrnty.png" alt="Warranty" />
-              <ServiceTextContainer>
-                <ServiceTitle>Warranty Protection</ServiceTitle>
-                <ServiceDescription>over 2 years</ServiceDescription>
-              </ServiceTextContainer>
+              <Grid container alignItems="center">
+                <ServiceImage src="wrnty.png" alt="Warranty" />
+                <ServiceTextContainer>
+                  <ServiceTitle>Warranty Protection</ServiceTitle>
+                  <ServiceDescription>over 2 years</ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
             </Grid>
 
             <Grid item xs={12} sm={6} md={3}>
-              <ServiceImage src="shiping.png" alt="Free Shipping" />
-              <ServiceTextContainer>
-                <ServiceTitle>Free Shipping</ServiceTitle>
-                <ServiceDescription>order over $150</ServiceDescription>
-              </ServiceTextContainer>
+              <Grid container alignItems="center">
+                <ServiceImage src="shiping.png" alt="Free Shipping" />
+                <ServiceTextContainer>
+                  <ServiceTitle>Free Shipping</ServiceTitle>
+                  <ServiceDescription>order over $150</ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
             </Grid>
 
             <Grid item xs={12} sm={6} md={3}>
-              <ServiceImage src="support.png" alt="Support" />
-              <ServiceTextContainer>
-                <ServiceTitle>24/7 Support</ServiceTitle>
-                <ServiceDescription>Dedicated support</ServiceDescription>
-              </ServiceTextContainer>
+              <Grid container alignItems="center">
+                <ServiceImage src="support.png" alt="Support" />
+                <ServiceTextContainer>
+                  <ServiceTitle>24/7 Support</ServiceTitle>
+                  <ServiceDescription>Dedicated support</ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
             </Grid>
           </Grid>
         </ServiceBox>

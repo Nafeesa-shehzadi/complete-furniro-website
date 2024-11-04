@@ -93,6 +93,8 @@ const StyledTotalBox = styled(Box)(({ theme }) => ({
     width: "100%", // Full width on medium and smaller screens
     gap: theme.spacing(0),
     padding: theme.spacing(3, 0),
+    marginBottom: theme.spacing(1),
+    marginLeft: theme.spacing(0),
   },
 }));
 
@@ -134,9 +136,8 @@ const ImageBox = styled(Box)(({ theme }) => ({
   position: "relative",
   gap: "3px",
   [theme.breakpoints.down("sm")]: {
-    width: "100px",
-    height: "60px",
-    flexDirection: "column",
+    width: "100%",
+    height: "40px",
   },
 }));
 

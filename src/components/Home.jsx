@@ -92,7 +92,7 @@ const ProductItems = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  gap: theme.spacing(3),
+  gap: theme.spacing(2),
   padding: theme.spacing(10),
   flexDirection: "column",
 }));
@@ -110,7 +110,7 @@ const StyledImageContainer = styled("div")({
   position: "relative",
   overflow: "hidden",
   width: "100%",
-  height: "300px",
+  height: "200px",
 });
 
 const HoverContentBox = styled("div")({
@@ -261,7 +261,7 @@ const OverlayBox = styled(Box)(({ theme }) => ({
   },
 }));
 
-const OverlayTitle = styled(Typography)(({ theme }) => ({
+const OverlayTitle = styled("div")(({ theme }) => ({
   fontSize: "1.2rem",
   display: "flex",
 }));
@@ -306,17 +306,19 @@ const SetupSection = styled(Box)(({ theme }) => ({
   margin: theme.spacing(5, 0),
 }));
 // Define your badge with circle shape, background color, and centered text
-const StyledBadge = styled(Badge)(({ theme, isNew }) => ({
-  position: "absolute",
-  top: "10px",
-  right: "10px",
-  padding: "15px 10px",
-  color: "white",
-  backgroundColor: isNew ? "#30c4ac" : "#ec8484", // Green for new, red for discount
-  borderRadius: "50%",
-  fontWeight: "bold",
-  fontSize: "0.8rem",
-}));
+const StyledBadge = styled(({ isNew, ...props }) => <Badge {...props} />)(
+  ({ isNew }) => ({
+    position: "absolute",
+    top: "10px",
+    right: "10px",
+    padding: "15px 10px",
+    color: "white",
+    backgroundColor: isNew ? "#30c4ac" : "#ec8484", // Green for new, red for discount
+    borderRadius: "50%",
+    fontWeight: "bold",
+    fontSize: "0.8rem",
+  })
+);
 const TitleContainer = styled("div")(({ expanded }) => ({
   display: "-webkit-box",
   WebkitBoxOrient: "vertical",
