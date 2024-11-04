@@ -19,7 +19,11 @@ import ShareIcon from "@mui/icons-material/Share";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder"; // Outlined icon for hollow like
-import { selectCartItems, addItemToCart } from "../redux/cartSlice";
+import {
+  selectCartItems,
+  addItemToCart,
+  removeItemFromCart,
+} from "../redux/cartSlice";
 import { useNavigate } from "react-router-dom";
 import Masonry from "@mui/lab/Masonry";
 
@@ -336,7 +340,7 @@ const TruncatedDescription = styled(Typography)({
 });
 const StyledExploreBtn = styled(Button)(({ theme }) => ({
   position: "absolute",
-  bottom: "60px",
+  bottom: "2px",
   left: "45%",
   transform: "translateX(-50%)",
   opacity: 0, // Hidden initially
@@ -424,24 +428,7 @@ const Home = () => {
   const handleDotClick = (index) => {
     setCurrentImageIndex(index);
   };
-  const handleAddToCart = (product) => {
-    try {
-      // Check if product is already in cart
-      const isInCart = cartItems.some((item) => item.id === product.id);
 
-      if (isInCart) {
-        setSnackbarMessage(`Item is already in the cart!`);
-      } else {
-        dispatch(addItemToCart({ ...product, quantity: 1 }));
-
-        setSnackbarMessage(`${product.title} added to cart!`);
-      }
-      setSnackbarOpen(true); // Show snackbar
-    } catch (error) {
-      setSnackbarMessage("Failed to add item to cart.");
-      setSnackbarOpen(true);
-    }
-  };
   const handleSnackbarClose = () => setSnackbarOpen(false);
 
   const handleShopNowClick = () => {
@@ -451,7 +438,21 @@ const Home = () => {
   const handleExploreClick = (productId) => {
     navigate(`/product/${productId}`);
   };
+  const isProductInCart = (productId) => {
+    return cartItems.some((item) => item.id === productId);
+  };
 
+  // Handle cart actions
+  const handleCart = (product) => {
+    if (isProductInCart(product.id)) {
+      dispatch(removeItemFromCart(product.id));
+      setSnackbarMessage(`Removed ${product.title} from the cart!`);
+    } else {
+      dispatch(addItemToCart({ ...product, quantity: 1 }));
+      setSnackbarMessage(`Added ${product.title} to the cart!`);
+    }
+    setSnackbarOpen(true); // Open snackbar after action
+  };
   return (
     <div>
       <HeroContainer>
@@ -538,12 +539,13 @@ const Home = () => {
                       />
                       <HoverContentBox className="hover-content">
                         <AddToCartButton
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent card click from triggering
-                            handleAddToCart(product);
-                          }}
+                          className="add-to-cart-btn"
+                          onClick={() => handleCart(product)}
+                          variant="outlined"
                         >
-                          Add to Cart
+                          {isProductInCart(product.id)
+                            ? "Remove from Cart"
+                            : "Add to Cart"}
                         </AddToCartButton>
                         <IconRow className="icon-row">
                           <SmallIconButton>
