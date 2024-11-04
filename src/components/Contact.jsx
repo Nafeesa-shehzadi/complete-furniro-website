@@ -7,6 +7,7 @@ import {
   TextField,
   Snackbar,
   Grid2,
+  Grid,
 } from "@mui/material";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
 import { Link } from "react-router-dom";
@@ -49,6 +50,19 @@ const Contactdetails = styled(Box)(({ theme }) => ({
   flex: "1 1 300px", // Responsive width
   padding: theme.spacing(5),
   paddingLeft: theme.spacing(20),
+  [theme.breakpoints.down("md")]: {
+    width: "100%", // Full width on medium and smaller screens
+    marginTop: theme.spacing(3),
+  },
+  [theme.breakpoints.down("sm")]: {
+    width: "100%", // Full width on medium and smaller screens
+    flexDirection: "column",
+    gap: theme.spacing(0),
+    padding: theme.spacing(3, 0),
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 }));
 
 const StyledField = styled(TextField)(({ theme }) => ({
@@ -199,7 +213,7 @@ function Contact() {
 
       <ContactSection>
         <Contactdetails>
-          <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <Typography variant="h6" fontWeight="bold">
             Contact Details
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", marginY: 3 }}>
@@ -227,7 +241,7 @@ function Contact() {
               </Typography>
             </Box>
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center", marginY: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", marginY: 3 }}>
             <WatchLaterIcon />
             <Box sx={{ marginLeft: 1 }}>
               <Typography variant="h6" fontWeight="bold">
@@ -294,31 +308,46 @@ function Contact() {
           </StyledButton>
         </ContactForm>
       </ContactSection>
-      <Grid2 item xs={12} sm={6}>
+      <Grid item xs={12}>
         <ServiceBox>
-          <ServiceImage src="quality.png" alt="logo" />
-          <ServiceTextContainer>
-            <ServiceTitle>High Quality</ServiceTitle>
-            <ServiceDescription>crafted from top materials</ServiceDescription>
-          </ServiceTextContainer>
-          <ServiceImage src="wrnty.png" alt="logo" />
-          <ServiceTextContainer>
-            <ServiceTitle>Warranty Protection</ServiceTitle>
-            <ServiceDescription>over 2 years</ServiceDescription>
-          </ServiceTextContainer>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={3}>
+              <ServiceImage src="quality.png" alt="Quality" />
+              <ServiceTextContainer>
+                <ServiceTitle>High Quality</ServiceTitle>
+                <ServiceDescription>
+                  crafted from top materials
+                </ServiceDescription>
+              </ServiceTextContainer>
+            </Grid>
 
-          <ServiceImage src="shiping.png" alt="logo" />
-          <ServiceTextContainer>
-            <ServiceTitle>Free Shipping</ServiceTitle>
-            <ServiceDescription>order over 150 $</ServiceDescription>
-          </ServiceTextContainer>
-          <ServiceImage src="support.png" alt="logo" />
-          <ServiceTextContainer>
-            <ServiceTitle>24 / 7 Support</ServiceTitle>
-            <ServiceDescription>Dedicated support</ServiceDescription>
-          </ServiceTextContainer>
+            <Grid item xs={12} sm={6} md={3}>
+              <ServiceImage src="wrnty.png" alt="Warranty" />
+              <ServiceTextContainer>
+                <ServiceTitle>Warranty Protection</ServiceTitle>
+                <ServiceDescription>over 2 years</ServiceDescription>
+              </ServiceTextContainer>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <ServiceImage src="shiping.png" alt="Free Shipping" />
+              <ServiceTextContainer>
+                <ServiceTitle>Free Shipping</ServiceTitle>
+                <ServiceDescription>order over $150</ServiceDescription>
+              </ServiceTextContainer>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <ServiceImage src="support.png" alt="Support" />
+              <ServiceTextContainer>
+                <ServiceTitle>24/7 Support</ServiceTitle>
+                <ServiceDescription>Dedicated support</ServiceDescription>
+              </ServiceTextContainer>
+            </Grid>
+          </Grid>
         </ServiceBox>
-      </Grid2>
+      </Grid>
+
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbarOpen}

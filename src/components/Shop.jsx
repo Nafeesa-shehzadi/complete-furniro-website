@@ -337,17 +337,7 @@ function Shop() {
     }
     setSnackbarOpen(true); // Open snackbar after action
   };
-  const handleAddToCart = (product) => {
-    const isInCart = cartItems.some((item) => item.id === product.id);
-    if (!isInCart) {
-      dispatch(addItemToCart({ ...product, quantity: 1 }));
-      setSnackbarOpen(true);
-      setSnackbarMessage(`${product.title} added in Cart`);
-    } else {
-      setSnackbarOpen(true);
-      setSnackbarMessage("Product already in cart");
-    }
-  };
+
   return (
     <ThemeProvider theme={theme}>
       <HeroSection>

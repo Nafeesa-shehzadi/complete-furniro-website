@@ -10,6 +10,7 @@ import {
   Snackbar,
   Alert,
   Tooltip,
+  Grid,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -65,6 +66,7 @@ const StyledBox = styled(Box)(({ theme }) => ({
     alignItems: "center",
   },
   [theme.breakpoints.down("sm")]: {
+    display: "none",
     alignItems: "flex-start",
     gap: theme.spacing(1),
     paddingRight: theme.spacing(0),
@@ -105,6 +107,7 @@ const ItemContainer = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down("sm")]: {
     flexDirection: "row",
     alignItems: "flex-start",
+    margin: theme.spacing(2),
   },
 }));
 
@@ -129,8 +132,7 @@ const ImageBox = styled(Box)(({ theme }) => ({
   borderRadius: "8px",
   overflow: "hidden",
   position: "relative",
-  textAlign: "center",
-  gap: "1px",
+  gap: "3px",
   [theme.breakpoints.down("sm")]: {
     width: "100px",
     height: "60px",
@@ -156,7 +158,40 @@ const ColumnContainer = styled(Box)(({ theme }) => ({
     alignItems: "center",
   },
 }));
+const ServiceBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexWrap: "wrap", // Allow items to wrap onto the next line
+  alignItems: "flex-start", // Align items at the start
+  backgroundColor: "#e6d6bc",
+  padding: theme.spacing(10, 2), // Reduce padding to prevent overflow
+  height: "auto",
+  gap: theme.spacing(1), // Space between items
+  overflow: "hidden", // Prevent overflow
+}));
 
+const ServiceImage = styled("img")(({ theme }) => ({
+  width: 60,
+  height: 60,
+  paddingLeft: theme.spacing(5),
+}));
+
+const ServiceTextContainer = styled(Box)(({ theme }) => ({
+  marginLeft: theme.spacing(1),
+  justifyContent: "center",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  paddingTop: theme.spacing(2),
+}));
+
+const ServiceTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: "bold",
+  variant: "h6",
+}));
+
+const ServiceDescription = styled(Typography)(({ theme }) => ({
+  variant: "body2",
+  color: theme.palette.text.secondary,
+}));
 function Cart() {
   const cartItems = useSelector(selectCartItems);
   const dispatch = useDispatch();
@@ -237,15 +272,15 @@ function Cart() {
                 display: "flex",
                 justifyContent: "center",
                 height: "50vh",
-                margin: theme.spacing(1, 3),
+                margin: theme.spacing(1, 2),
                 width: "100%",
               }}
             >
               <img
                 src="./cart.jpeg"
                 alt="empty cart"
-                width="500px"
                 style={{ borderRadius: "8px" }}
+                width="500px"
               />
             </Box>
           ) : (
@@ -320,10 +355,58 @@ function Cart() {
             </Typography>
           </Typography>
           <Link to="/checkout" style={{ textDecoration: "none" }}>
-            <StyledButton variant="outlined">CheckOut now</StyledButton>
+            <StyledButton variant="outlined">Check Out </StyledButton>
           </Link>
         </StyledTotalBox>
       </Wrapper>
+      <Grid item xs={12}>
+        <ServiceBox>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Grid container alignItems="center">
+                <ServiceImage src="quality.png" alt="Quality" />
+                <ServiceTextContainer>
+                  <ServiceTitle>High Quality</ServiceTitle>
+                  <ServiceDescription>
+                    crafted from top materials
+                  </ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Grid container alignItems="center">
+                <ServiceImage src="wrnty.png" alt="Warranty" />
+                <ServiceTextContainer>
+                  <ServiceTitle>Warranty Protection</ServiceTitle>
+                  <ServiceDescription>over 2 years</ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Grid container alignItems="center">
+                <ServiceImage src="shiping.png" alt="Free Shipping" />
+                <ServiceTextContainer>
+                  <ServiceTitle>Free Shipping</ServiceTitle>
+                  <ServiceDescription>order over $150</ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Grid container alignItems="center">
+                <ServiceImage src="support.png" alt="Support" />
+                <ServiceTextContainer>
+                  <ServiceTitle>24/7 Support</ServiceTitle>
+                  <ServiceDescription>Dedicated support</ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
+            </Grid>
+          </Grid>
+        </ServiceBox>
+      </Grid>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

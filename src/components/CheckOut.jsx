@@ -24,7 +24,7 @@ import { useSelector } from "react-redux";
 import { selectCartItems } from "../redux/cartSlice";
 import Select from "react-select";
 import countryList from "react-select-country-list";
-
+import { Close } from "@mui/icons-material";
 const HeroSection = styled(Box)(({ theme }) => ({
   backgroundImage: `url(./shop.png)`,
   backgroundSize: "cover",
@@ -42,11 +42,45 @@ const StyledButton = styled(Button)(({ theme }) => ({
   width: "50%",
   height: "50px",
   marginLeft: "1px",
-  borderColor: theme.palette.common.black,
+  border: `1px solid ${theme.palette.common.black}`, // Set a border with color
   marginTop: 10,
   color: theme.palette.common.black,
 }));
 
+const ServiceBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexWrap: "wrap", // Allow items to wrap onto the next line
+  alignItems: "flex-start", // Align items at the start
+  backgroundColor: "#e6d6bc",
+  padding: theme.spacing(10, 2), // Reduce padding to prevent overflow
+  height: "auto",
+  gap: theme.spacing(1), // Space between items
+  overflow: "hidden", // Prevent overflow
+}));
+
+const ServiceImage = styled("img")(({ theme }) => ({
+  width: 60,
+  height: 60,
+  paddingLeft: theme.spacing(5),
+}));
+
+const ServiceTextContainer = styled(Box)(({ theme }) => ({
+  marginLeft: theme.spacing(1),
+  justifyContent: "center",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  paddingTop: theme.spacing(2),
+}));
+
+const ServiceTitle = styled(Typography)(({ theme }) => ({
+  fontWeight: "bold",
+  variant: "h6",
+}));
+
+const ServiceDescription = styled(Typography)(({ theme }) => ({
+  variant: "body2",
+  color: theme.palette.text.secondary,
+}));
 function CheckOut() {
   const theme = createTheme();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -180,37 +214,47 @@ function CheckOut() {
             Billing Details
           </Typography>
           <Grid container spacing={2}>
-            {Object.keys(initialFormValues).map((key) => (
-              <Grid item xs={12} md={key === "companyName" ? 12 : 6} key={key}>
-                <InputLabel>
-                  {key.charAt(0).toUpperCase() +
-                    key.slice(1).replace(/([A-Z])/g, " $1")}
-                </InputLabel>
-                <OutlinedInput
-                  fullWidth
-                  value={formValues[key]}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    setFormValues((prevValues) => ({
-                      ...prevValues,
-                      [key]: value,
-                    }));
-                    if (errors[key]) {
-                      setErrors((prevErrors) => ({
-                        ...prevErrors,
-                        [key]: undefined,
-                      }));
-                    }
-                  }}
-                  error={!!errors[key]}
-                  multiline={key === "additionalInfo"}
-                  rows={key === "additionalInfo" ? 4 : 1}
-                />
-                {errors[key] && (
-                  <Typography color="error">{errors[key]}</Typography>
-                )}
-              </Grid>
-            ))}
+            {Object.keys(initialFormValues).map(
+              (key) =>
+                key !== "country" &&
+                key !== "cardNumber" && (
+                  // Exclude "country" from being rendered twice
+                  <Grid
+                    item
+                    xs={12}
+                    md={key === "firstName" || key === "lastName" ? 6 : 12}
+                    key={key}
+                  >
+                    <InputLabel>
+                      {key.charAt(0).toUpperCase() +
+                        key.slice(1).replace(/([A-Z])/g, " $1")}
+                    </InputLabel>
+                    <OutlinedInput
+                      fullWidth
+                      value={formValues[key]}
+                      onChange={(e) => {
+                        const { value } = e.target;
+                        setFormValues((prevValues) => ({
+                          ...prevValues,
+                          [key]: value,
+                        }));
+                        if (errors[key]) {
+                          setErrors((prevErrors) => ({
+                            ...prevErrors,
+                            [key]: undefined,
+                          }));
+                        }
+                      }}
+                      error={!!errors[key]}
+                      multiline={key === "additionalInfo"}
+                      rows={key === "additionalInfo" ? 4 : 1}
+                    />
+                    {errors[key] && (
+                      <Typography color="error">{errors[key]}</Typography>
+                    )}
+                  </Grid>
+                )
+            )}
             <Grid item xs={12}>
               <InputLabel>Country</InputLabel>
               <Select
@@ -262,7 +306,24 @@ function CheckOut() {
               {totalPrice.toFixed(2)}
             </Typography>
           </Box>
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              mt: 2,
+              flexDirection: "column",
+            }}
+          >
+            <Typography
+              variant="body1"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
+              Make your payment directly into our bank account. Please use your
+              Order ID as the payment reference. Your order will not be shipped
+              until the funds have cleared in our account.
+            </Typography>
             <FormControl component="fieldset" sx={{ marginTop: 4 }}>
               <RadioGroup
                 value={paymentMethod}
@@ -279,43 +340,115 @@ function CheckOut() {
                   label="Bank Transfer"
                 />
               </RadioGroup>
+
               {paymentMethod === "bank_transfer" && (
-                <OutlinedInput
-                  fullWidth
-                  required
-                  placeholder="Card Number"
-                  value={formValues.cardNumber}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    setFormValues((prevValues) => ({
-                      ...prevValues,
-                      cardNumber: value,
-                    }));
-                    if (errors.cardNumber) {
-                      setErrors((prevErrors) => ({
-                        ...prevErrors,
-                        cardNumber: undefined,
+                <>
+                  <OutlinedInput
+                    fullWidth
+                    required
+                    placeholder="Card Number"
+                    value={formValues.cardNumber}
+                    onChange={(e) => {
+                      const { value } = e.target;
+                      setFormValues((prevValues) => ({
+                        ...prevValues,
+                        cardNumber: value,
                       }));
-                    }
-                  }}
-                  error={!!errors.cardNumber}
-                />
+                      if (errors.cardNumber) {
+                        setErrors((prevErrors) => ({
+                          ...prevErrors,
+                          cardNumber: undefined,
+                        }));
+                      }
+                    }}
+                    error={!!errors.cardNumber}
+                  />
+                  <Typography variant="body1">
+                    Your personal data will be used to support your experience
+                    throughout this website, to manage access to your account,
+                    and for other purposes described in our{" "}
+                    <span
+                      style={{
+                        fontWeight: "bold",
+                      }}
+                    >
+                      privacy policy
+                    </span>{" "}
+                    .
+                  </Typography>
+                </>
               )}
             </FormControl>
           </Box>
           <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-            <StyledButton onClick={handlePlaceOrderClick}>
+            <StyledButton
+              onClick={handlePlaceOrderClick}
+              disabled={cartItems.length === 0}
+            >
               Place Order
             </StyledButton>
           </Box>
         </Box>
       </Box>
+      <Grid item xs={12}>
+        <ServiceBox>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={3}>
+              <Grid container alignItems="center">
+                <ServiceImage src="quality.png" alt="Quality" />
+                <ServiceTextContainer>
+                  <ServiceTitle>High Quality</ServiceTitle>
+                  <ServiceDescription>
+                    crafted from top materials
+                  </ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Grid container alignItems="center">
+                <ServiceImage src="wrnty.png" alt="Warranty" />
+                <ServiceTextContainer>
+                  <ServiceTitle>Warranty Protection</ServiceTitle>
+                  <ServiceDescription>over 2 years</ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Grid container alignItems="center">
+                <ServiceImage src="shiping.png" alt="Free Shipping" />
+                <ServiceTextContainer>
+                  <ServiceTitle>Free Shipping</ServiceTitle>
+                  <ServiceDescription>order over $150</ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3}>
+              <Grid container alignItems="center">
+                <ServiceImage src="support.png" alt="Support" />
+                <ServiceTextContainer>
+                  <ServiceTitle>24/7 Support</ServiceTitle>
+                  <ServiceDescription>Dedicated support</ServiceDescription>
+                </ServiceTextContainer>
+              </Grid>
+            </Grid>
+          </Grid>
+        </ServiceBox>
+      </Grid>
 
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         message="Order placed successfully!"
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        action={
+          <Button color="inherit" onClick={handleCloseSnackbar}>
+            <Close />
+          </Button>
+        }
       />
       <Dialog
         open={dialogOpen}
