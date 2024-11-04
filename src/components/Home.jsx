@@ -620,21 +620,30 @@ const Home = () => {
                           justifyContent: "space-between",
                         }}
                       >
-                        <Box component="span">
-                          Rs: {product.discountPrice}{" "}
-                          {/* Discount price at the start */}
-                        </Box>
-                        <Box
-                          component="span"
-                          sx={{
-                            ml: 2,
-                            color: "text.secondary",
-                            fontWeight: "normal",
-                          }} // Left margin and secondary color for original price
-                        >
-                          <del> Rs:{product.price}</del>{" "}
-                          {/* Original price with strikethrough at the end */}
-                        </Box>
+                        {product.isNew ? (
+                          // If the product is new, show the original price only
+                          <Box component="span">
+                            Rs: {product.price} {/* Original price only */}
+                          </Box>
+                        ) : (
+                          // If the product is not new, show the discount price and the original price
+                          <>
+                            <Box component="span">
+                              Rs: {product.discountPrice} {/* Discount price */}
+                            </Box>
+                            <Box
+                              component="span"
+                              sx={{
+                                ml: 2,
+                                color: "text.secondary",
+                                fontWeight: "normal",
+                              }}
+                            >
+                              <del>Rs: {product.price}</del>{" "}
+                              {/* Original price with strikethrough */}
+                            </Box>
+                          </>
+                        )}
                       </Typography>
                     </CardContentBox>
                   </StyledCard>

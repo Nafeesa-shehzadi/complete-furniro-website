@@ -89,8 +89,16 @@ const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
   justifyContent: "center", // Center the items horizontally
   alignItems: "center", // Center the items vertically
   padding: "15px", // Add padding
+  maxWidth: "400px", //
   "&:hover": {
     backgroundColor: "transparent", // Keep the background transparent on hover
+  },
+  [theme.breakpoints.down("md")]: {
+    fontSize: 18, // Adjust font size for smaller screens
+    padding: theme.spacing(1),
+  },
+  [theme.breakpoints.down("sm")]: {
+    fontSize: 14, // Adjust font size for smaller screens
   },
 }));
 
@@ -266,8 +274,9 @@ export default function Navbar() {
               >
                 <ListItemText
                   sx={{
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
+                    whiteSpace: "wrap",
+                    textTransform: "capitalize",
+                    width: "200px",
                   }}
                   primary={item.title}
                 />

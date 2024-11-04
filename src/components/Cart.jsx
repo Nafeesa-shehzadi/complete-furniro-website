@@ -19,6 +19,7 @@ import {
   updateQuantity,
 } from "../redux/cartSlice";
 import { Delete } from "@mui/icons-material";
+import { useMediaQuery } from "@mui/material"; // Import useMediaQuery
 
 const theme = createTheme();
 
@@ -41,7 +42,7 @@ const Wrapper = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "row",
   width: "100%",
-  gap: "40px",
+  gap: "20px",
   [theme.breakpoints.down("md")]: {
     flexDirection: "column",
     alignItems: "center",
@@ -63,6 +64,12 @@ const StyledBox = styled(Box)(({ theme }) => ({
     width: "100%", // Full width on medium and smaller screens
     alignItems: "center",
   },
+  [theme.breakpoints.down("sm")]: {
+    alignItems: "flex-start",
+    gap: theme.spacing(1),
+    paddingRight: theme.spacing(0),
+    padding: theme.spacing(3, 0),
+  },
 }));
 
 const StyledTotalBox = styled(Box)(({ theme }) => ({
@@ -74,10 +81,16 @@ const StyledTotalBox = styled(Box)(({ theme }) => ({
   backgroundColor: "#e6d6bc",
   width: "30%",
   height: "20%",
+  marginLeft: "5px",
   flexDirection: "column",
   [theme.breakpoints.down("md")]: {
     width: "100%", // Full width on medium and smaller screens
     marginTop: theme.spacing(3),
+  },
+  [theme.breakpoints.down("sm")]: {
+    width: "100%", // Full width on medium and smaller screens
+    gap: theme.spacing(0),
+    padding: theme.spacing(3, 0),
   },
 }));
 
@@ -111,12 +124,13 @@ const ImageBox = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: "180px",
+  width: "150px",
   height: "100px",
   borderRadius: "8px",
   overflow: "hidden",
   position: "relative",
   textAlign: "center",
+  gap: "1px",
   [theme.breakpoints.down("sm")]: {
     width: "100px",
     height: "60px",
@@ -125,7 +139,7 @@ const ImageBox = styled(Box)(({ theme }) => ({
 }));
 
 const StyledImage = styled("img")({
-  width: "100%",
+  width: "50%",
   height: "100%",
   objectFit: "cover",
 });
@@ -163,6 +177,7 @@ function Cart() {
     (acc, item) => acc + item.discountPrice * item.quantity,
     0
   );
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <ThemeProvider theme={theme}>
@@ -238,11 +253,13 @@ function Cart() {
               <ItemContainer key={item.id}>
                 <ImageBox>
                   <StyledImage src={item.thumbnail} alt={item.title} />
-                  <TitleTypography variant="body2">
-                    {item.title}
-                  </TitleTypography>
+                  {!isSmallScreen && ( // Only show title if not on small screen
+                    <TitleTypography variant="body2">
+                      {item.title}
+                    </TitleTypography>
+                  )}
                 </ImageBox>
-                <Typography variant="body" sx={{ minWidth: "80px" }}>
+                <Typography variant="body">
                   Rs: {item.discountPrice.toFixed(2)}
                 </Typography>
                 <TextField
@@ -257,10 +274,13 @@ function Cart() {
                       })
                     )
                   }
-                  sx={{ width: "60px" }}
+                  sx={{ ml: "30px", width: "60px" }}
                 />
-                <Typography variant="body" sx={{ minWidth: "80px" }}>
-                  SubTotal: {item.discountPrice * item.quantity}
+                <Typography
+                  variant="body"
+                  sx={{ ml: "40px", minWidth: "80px" }}
+                >
+                  {item.discountPrice * item.quantity}
                 </Typography>
                 <Tooltip title="Delete">
                   <IconButton onClick={() => handleRemoveItem(item.id)}>
