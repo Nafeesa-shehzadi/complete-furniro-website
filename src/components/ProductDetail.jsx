@@ -26,6 +26,7 @@ import FacebookIcon from "@mui/icons-material/Facebook";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import Masonry from "@mui/lab/Masonry";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 // Styled components
 const StyledContainer = styled(Box)(({ theme }) => ({
   maxWidth: "100%",
@@ -467,7 +468,7 @@ const ProductDetail = () => {
               key={image.id}
               sx={{ position: "relative", overflow: "hidden" }}
             >
-              <img
+              <LazyLoadImage
                 src={image.src}
                 alt={image.title}
                 style={{

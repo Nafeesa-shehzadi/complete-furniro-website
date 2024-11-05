@@ -25,7 +25,6 @@ import {
   Grid,
   Grid2,
   CardContent,
-  TextField,
   InputAdornment,
   MenuItem,
   FormControl,
@@ -33,9 +32,9 @@ import {
   InputLabel,
   Snackbar,
   Badge,
+  OutlinedInput,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-
 const itemsPerPage = 8; // Fixed number of items per page
 
 const HeroSection = styled(Box)(({ theme }) => ({
@@ -58,16 +57,18 @@ const SearchSection = styled(Box)(({ theme }) => ({
   alignItems: "center",
   backgroundColor: "#f2edda",
   flexDirection: "row",
+  padding: theme.spacing(10), // Default padding for smaller screens
   gap: theme.spacing(2), // Reduced gap for better fitting on smaller screens
-  padding: theme.spacing(2), // Default padding for smaller screens
   height: "15vh",
   marginTop: 0, // Ensure there's no margin around this section
 
   [theme.breakpoints.down("sm")]: {
     padding: theme.spacing(0, 5), // Adjust padding for small screens
+    flexDirection: "column",
+    height: "auto",
   },
   [theme.breakpoints.up("md")]: {
-    padding: theme.spacing(0, 10), // Padding for medium screens
+    padding: theme.spacing(0, 20), // Padding for medium screens
   },
   [theme.breakpoints.up("lg")]: {
     padding: theme.spacing(0, 15), // Padding for large screens
@@ -141,7 +142,7 @@ const ProductItems = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  gap: theme.spacing(3),
+  gap: theme.spacing(1),
   padding: theme.spacing(10),
   flexDirection: "column",
 }));
@@ -244,8 +245,8 @@ function Shop() {
   const [totalDisplayCount, setTotalDisplayCount] = useState(8); // Total items to display
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const products = useSelector(selectDisplayedProducts);
-  const cartItems = useSelector(selectCartItems);
+  const products = useSelector(selectDisplayedProducts) ?? [];
+  const cartItems = useSelector(selectCartItems) ?? [];
   const status = useSelector((state) => state.products.status);
   const [likedItems, setLikedItems] = useState({});
   const [itemsPerRow, setItemsPerRow] = useState(3); // Initially 4 items per row
@@ -257,17 +258,17 @@ function Shop() {
 
   // Combined search and sort
   const filteredAndSortedProducts = products
-    .filter((product) => product.title.toLowerCase().includes(searchQuery))
+    .filter((product) => product?.title?.toLowerCase().includes(searchQuery))
     .sort((a, b) => {
       switch (sortOption) {
         case "expensive":
-          return b.discountPrice - a.discountPrice;
+          return b?.discountPrice ?? b.price - a?.discountPrice ?? a.price;
         case "cheaper":
-          return a.discountPrice - b.discountPrice;
+          return a?.discountPrice ?? a.price - b?.discountPrice ?? b.price;
         case "az":
-          return a.title.localeCompare(b.title);
+          return (a?.title ?? "").localeCompare(b?.title ?? "");
         case "za":
-          return b.title.localeCompare(a.title);
+          return (b?.title ?? "").localeCompare(a?.title ?? "");
         default:
           return 0;
       }
@@ -323,17 +324,17 @@ function Shop() {
   };
   const totalButtons = Math.ceil(products.length / itemsPerPage); // Total buttons based on products
   const isProductInCart = (productId) => {
-    return cartItems.some((item) => item.id === productId);
+    return cartItems.some((item) => item?.id === productId);
   };
 
   // Handle cart actions
   const handleCart = (product) => {
-    if (isProductInCart(product.id)) {
+    if (isProductInCart(product?.id)) {
       dispatch(removeItemFromCart(product.id));
-      setSnackbarMessage(`Removed ${product.title} from the cart!`);
+      setSnackbarMessage(`Removed ${product?.title ?? " "} from the cart!`);
     } else {
       dispatch(addItemToCart({ ...product, quantity: 1 }));
-      setSnackbarMessage(`Added ${product.title} to the cart!`);
+      setSnackbarMessage(`Added ${product?.title} to the cart!`);
     }
     setSnackbarOpen(true); // Open snackbar after action
   };
@@ -377,9 +378,7 @@ function Shop() {
         </Box>
       </HeroSection>
       <SearchSection>
-        <TextField
-          label="Search products..."
-          variant="outlined"
+        <OutlinedInput
           value={searchQuery}
           onChange={handleSearchChange}
           InputProps={{
@@ -389,8 +388,12 @@ function Shop() {
               </InputAdornment>
             ),
           }}
+          placeholder="search"
+          sx={{
+            minWidth: 150,
+          }}
         />
-        <FormControl variant="outlined" sx={{ minWidth: 60 }}>
+        <FormControl variant="outlined" sx={{ minWidth: 150 }}>
           <InputLabel>Sort by</InputLabel>
           <Select
             value={sortOption}
@@ -415,12 +418,14 @@ function Shop() {
           onClick={() => handleGridChange(12)}
           sx={{ display: { xs: "none", sm: "block" } }} // Hide on small screens
         />
-        <FormControl variant="outlined" sx={{ minWidth: 60 }}>
+        <FormControl variant="outlined">
           <InputLabel>Show</InputLabel>
+
           <Select
             value={totalDisplayCount}
             onChange={handleDisplayCountChange}
-            label="Display Count"
+            label="show"
+            sx={{ minWidth: 150 }}
           >
             <MenuItem value={8}>8</MenuItem>
             <MenuItem value={12}>12</MenuItem>
@@ -444,6 +449,11 @@ function Shop() {
               md={itemsPerRow === 3 ? 3 : itemsPerRow === 6 ? 6 : 12} // 4, 2, or 1 items per row on medium
               lg={itemsPerRow} // Full control over the grid size for large screens
               key={product.id}
+              sx={{
+                display: "flex", // Enable flexbox
+                justifyContent: "center", // Center card horizontally
+                alignItems: "center", // Center card vertically if necessary
+              }}
             >
               {" "}
               <StyledCard>
@@ -459,7 +469,7 @@ function Shop() {
                     onClick={() => handleCart(product)}
                     variant="outlined"
                   >
-                    {isProductInCart(product.id)
+                    {isProductInCart(product?.id)
                       ? "Remove from Cart"
                       : "Add to Cart"}
                   </AddToCartButton>

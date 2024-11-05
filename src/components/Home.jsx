@@ -26,7 +26,8 @@ import {
 } from "../redux/cartSlice";
 import { useNavigate } from "react-router-dom";
 import Masonry from "@mui/lab/Masonry";
-
+import "react-lazy-load-image-component/src/effects/blur.css";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 // Styled components definitions...
 
 const HeroContainer = styled(Box)(({ theme }) => ({
@@ -85,13 +86,13 @@ const ProductBox = styled(Box)(({ theme }) => ({
     padding: theme.spacing(5, 20), // Larger padding on medium and larger screens
   },
 }));
-const StyledImageCategory = styled("img")({
-  width: "100%",
-  maxWidth: "400px",
-  height: "auto",
-  display: "block",
-  margin: "0 auto",
-});
+const StyledImageCategory = styled(LazyLoadImage)`
+  // Add your styles here (if any)
+  border-radius: 8px; // Example of adding rounded corners
+  width: 100%; // Ensure the image takes the full width
+  height: auto; // Maintain aspect ratio
+`;
+
 const ProductItems = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
@@ -198,16 +199,20 @@ const StyledDesignSection = styled(Box)(({ theme }) => ({
 }));
 
 const StyledImageroom = styled("img")(({ theme }) => ({
-  width: "400px",
+  width: "350px",
   height: "400px",
   objectFit: "contain",
+  display: "block", // Ensures no inline spacing
+  overflow: "hidden", // Prevents overflow
 }));
 
 const StyledImageroom2 = styled("img")(({ theme }) => ({
-  width: "400px",
+  width: "350px",
   height: "350px",
   objectFit: "cover",
-  marginLeft: theme.spacing(0.1), // Align right to fit next to the design section
+  marginLeft: theme.spacing(0.1),
+  display: "block", // Ensures no inline spacing
+  overflow: "hidden", // Prevents overflow // Align right to fit next to the design section
 }));
 
 const DotContainer = styled(Box)(({ theme }) => ({
@@ -247,10 +252,10 @@ const Dot = styled("span")(({ active }) => ({
 
 const OverlayBox = styled(Box)(({ theme }) => ({
   position: "absolute",
-  top: 250,
-  left: 70,
+  top: "50%",
+  left: "20%",
   right: "auto",
-  bottom: 60,
+  bottom: "20%",
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
@@ -285,10 +290,10 @@ const Line = styled("hr")(({ theme }) => ({
 
 const OverlayButton = styled(Button)(({ theme }) => ({
   position: "absolute",
-  top: 350,
-  left: 220,
+  top: "80%",
+  left: "65%",
   right: "auto",
-  bottom: 20,
+  bottom: "10%",
   backgroundColor: "#ccbe66",
   color: "white",
   "&:hover": {
@@ -388,12 +393,11 @@ const Home = () => {
   const roomImages = [
     { src: "/room1.png", title: "Bedroom", subtitle: "Inner Peace" },
     { src: "/room2.png", title: "Living Room", subtitle: "Cozy Vibes" },
-    { src: "/set4.png", title: "Kitchen", subtitle: "Modern Style" },
-    { src: "/set3.png", title: "Living", subtitle: "Modern Style" },
+    { src: "/room3.jpeg", title: "Kitchen", subtitle: "Modern Style" },
+    { src: "/room4.jpeg", title: "Living", subtitle: "Modern Style" },
   ];
   const imagess = Array.from({ length: 16 }, (_, index) => {
-    // Define a pattern of heights to repeat
-    const heightPattern = [400, 350, 250, 150];
+    const heightPattern = [360, 350, 250, 150];
 
     return {
       id: index + 1,
@@ -499,19 +503,48 @@ const Home = () => {
         <Typography variant="h6">Discover amazing range!</Typography>
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6} md={4}>
-            <StyledImageCategory src="/dining.png" alt="Dining" />
+            <StyledImageCategory
+              src="/dining.png"
+              alt="Dining"
+              loading="lazy" // Lazy loading attribute
+              effect="blur"
+              wrapperProps={{
+                // If you need to, you can tweak the effect transition using the wrapper style.
+                style: { transitionDelay: "1s" },
+              }}
+            />
             <Typography variant="h6" fontWeight="bold" align="center">
               Dining
             </Typography>{" "}
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
-            <StyledImageCategory src="/living.png" alt="Living" />
+            <StyledImageCategory
+              src="/living.png"
+              alt="Living"
+              loading="lazy" // Lazy loading attribute
+              effect="blur"
+              wrapperProps={{
+                style: {
+                  transitionDelay: "2s",
+                },
+              }}
+            />
             <Typography variant="h6" fontWeight="bold" align="center">
               Living
             </Typography>{" "}
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
-            <StyledImageCategory src="/bedroom2.png" alt="Bedroom" />
+            <StyledImageCategory
+              src="/bedroom2.png"
+              alt="Bedroom"
+              loading="lazy" // Lazy loading attribute
+              effect="blur"
+              wrapperProps={{
+                style: {
+                  transitionDelay: "3s",
+                },
+              }}
+            />
             <Typography variant="h6" fontWeight="bold" align="center">
               Bedroom
             </Typography>{" "}
@@ -536,6 +569,7 @@ const Home = () => {
                       <StyledImage
                         src={product.thumbnail}
                         alt={product.title}
+                        loading="lazy" // Lazy loading attribute
                       />
                       <HoverContentBox className="hover-content">
                         <AddToCartButton
@@ -670,11 +704,16 @@ const Home = () => {
           spacing={4}
           justifyContent="center"
           alignItems="center"
-          ml="50px"
+          sx={{ margin: { xs: "0", md: "0 50px" } }} // Adjust margin based on screen size
         >
           {/* First Column: Text and Button */}
           <Grid item xs={12} md={6}>
-            <Typography variant="h2" fontWeight="bold" gutterBottom>
+            <Typography
+              variant="h4" // Smaller for mobile, large for desktop
+              fontWeight="bold"
+              gutterBottom
+              sx={{ fontSize: { xs: "1.5rem", md: "2.5rem" } }} // Responsive font size
+            >
               50+ Beautiful Rooms Inspiration
             </Typography>
             <Typography variant="body1" paragraph>
@@ -688,9 +727,9 @@ const Home = () => {
                 color: "white",
                 "&:hover": {
                   backgroundColor: "#ccbe66",
-                  color: "white",
                 },
-                width: "15rem",
+                width: { xs: "80%", sm: "15rem" }, // Full width on small screens
+                margin: 2,
               }}
             >
               Explore More
@@ -699,12 +738,19 @@ const Home = () => {
 
           {/* Second Column: Images with Overlays */}
           <Grid item xs={12} md={6}>
-            <Box sx={{ display: "flex", flexDirection: "row", gap: "1px" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" }, // Stack vertically on small screens
+                gap: "8px",
+              }}
+            >
               {/* First Image with Overlay */}
               <Box sx={{ position: "relative", width: "100%" }}>
                 <StyledImageroom
                   src={roomImages[currentImageIndex].src}
-                  alt={`Room ${currentImageIndex + 1}`} // Fixed template literal
+                  alt={`Room ${currentImageIndex + 1}`}
+                  loading="lazy"
                 />
                 <OverlayBox>
                   <OverlayTitle sx={{ display: "flex", alignItems: "center" }}>
@@ -718,14 +764,14 @@ const Home = () => {
                     {roomImages[currentImageIndex].subtitle}
                   </OverlaySubtitle>
                 </OverlayBox>
-
                 <OverlayButton
                   variant="contained"
-                  endIcon={<ArrowForwardIcon />} // Arrow icon on the right
+                  endIcon={<ArrowForwardIcon />}
                   onClick={handleNextImage}
                 />
               </Box>
 
+              {/* Second Image with Dots */}
               <Box sx={{ position: "relative", width: "100%" }}>
                 <StyledImageroom2
                   src={
@@ -733,9 +779,9 @@ const Home = () => {
                   }
                   alt={`Room ${
                     ((currentImageIndex + 1) % roomImages.length) + 1
-                  }`} // Fixed template literal
+                  }`}
+                  loading="lazy"
                 />
-
                 <DotContainer>
                   {roomImages.map((_, index) => (
                     <Dot
@@ -750,6 +796,7 @@ const Home = () => {
           </Grid>
         </Grid>
       </StyledDesignSection>
+
       <SetupSection>
         <Typography variant="h5" fontWeight="bold">
           Share your setup with
@@ -764,15 +811,14 @@ const Home = () => {
               key={image.id}
               sx={{ position: "relative", overflow: "hidden" }}
             >
-              <img
-                src={image.src}
+              <LazyLoadImage
                 alt={image.title}
-                style={{
-                  width: "100%",
-                  height: image.height,
-                  borderRadius: "5px",
-                  marginTop: image.marginTop,
+                effect="blur"
+                wrapperProps={{
+                  // If you need to, you can tweak the effect transition using the wrapper style.
+                  style: { transitionDelay: "3s" },
                 }}
+                src={image.src}
               />
             </Box>
           ))}
